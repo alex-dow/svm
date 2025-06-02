@@ -1,13 +1,7 @@
+import Loading from "@/components/Loading";
 import "./globals.css";
 import { ProgressSpinner } from 'primereact/progressspinner';
 import { Suspense } from "react";
-
-
-function PageLoading() {
-  return (
-    <ProgressSpinner />
-  )
-}
 
 export default async function RootLayout({
   children,
@@ -21,7 +15,7 @@ export default async function RootLayout({
         className={`antialiased dark`}
       >
         
-          <Suspense fallback={<PageLoading/>}>
+          <Suspense fallback={<Loading/>}>
 
             {children}
           </Suspense>

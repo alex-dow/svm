@@ -2,8 +2,8 @@ export default async function DronesPage({params}: {params: Promise<{projectId: 
     const { projectId } = await params;
 
     return (
-        <div>
-            <p>Drones for { projectId }</p>
+        <div className="p-2">
+            <p>This feature is not implemented yet.</p>
         </div>
     )
 

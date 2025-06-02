@@ -1,4 +1,5 @@
 import AppHeader from "@/components/layout/AppHeader";
+import Loading from "@/components/Loading";
 import { Suspense } from "react";
 
 export default async function ProjectsRootLayout({children}: {children: React.ReactNode}) {
@@ -7,7 +8,7 @@ export default async function ProjectsRootLayout({children}: {children: React.Re
         <>
             <AppHeader  />
             <main className="flex flex-col flex-1">
-                <Suspense fallback={<p>LOADING</p>}>
+                <Suspense fallback={<Loading />}>
                     {children}
                 </Suspense>
             </main>

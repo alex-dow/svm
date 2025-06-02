@@ -2,8 +2,8 @@ export default async function TrucksPage({params}: {params: Promise<{projectId: 
     const { projectId } = await params;
 
     return (
-        <div>
-            <p>Trucks for { projectId }</p>
+        <div className="p-2">
+            <p>This feature is not implemented yet.</p>
         </div>
     )
 
