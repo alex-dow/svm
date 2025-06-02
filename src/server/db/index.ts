@@ -55,7 +55,8 @@ export function getDatabase(dbUrl?: string): Kysely<SVMDatabase> {
                     host: parsedUrl.hostname,
                     port: parseInt(parsedUrl.port),
                     user: parsedUrl.username,
-                    password: parsedUrl.password
+                    password: parsedUrl.password,
+                    ssl: parsedUrl.searchParams.get('sslmode') === 'require'
 
                 })
             });
