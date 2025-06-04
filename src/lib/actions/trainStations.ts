@@ -2,7 +2,7 @@
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
 import { deleteTrainStation,  getCachedTrainStation,  getCachedTrainStations,  getTrainStation } from "../services/stations";
-import { addStationPlatform, countStationPlatforms, getCachedTrainStationPlatforms, getTrainStationPlatform, removeStationPlatform, repositionStationPlatform, setPlatformMode, toggleStationPlatformMode } from "../services/stationPlatforms";
+import { addStationPlatform, addStationPlatformItem, countStationPlatforms, getCachedTrainStationPlatforms, getStationPlatformItem, getStationPlatformItems, getTrainStationPlatform, removeStationPlatform, removeStationPlatformItem, repositionStationPlatform, setPlatformMode, toggleStationPlatformMode } from "../services/stationPlatforms";
 
 
 export async function handleGetTrainStations(projectId: number) {
@@ -69,4 +69,29 @@ export async function handleSetPlatformMode(platformId: number, mode: 'loading' 
     await setPlatformMode(platformId, mode, user.id);
 
     revalidateTag(`train-station-platforms:${platform.train_station_id}`);
+}
+
+export async function handleGetPlatformItems(platformId: number) {
+    const user = await getCurrentUser();
+
+    return getStationPlatformItems(platformId, user.id);
+    
+}
+
+export async function handleAddPlatformItem(platformId: number, itemId: string, rate: number) {
+    const user = await getCurrentUser();
+    const platform = await getTrainStationPlatform(platformId, user.id);
+    if (!platform) throw new Error('Platform not found');
+
+    await addStationPlatformItem(platformId, itemId, rate, user.id);
+    revalidateTag(`train-station-platform-items:${platformId}`)
+}
+
+export async function handleRemovePlatformItem(platformId: number, itemId: number) {
+    const user = await getCurrentUser();
+    const item = await getStationPlatformItem(itemId, user.id);
+    if (!item) throw new Error('Platform item not found');
+
+    await removeStationPlatformItem(itemId, user.id);
+    revalidateTag(`train-station-platform-items:${platformId}`)
 }

@@ -1,10 +1,10 @@
 import PlatformAccordionTabHeader from "./PlatformAccordionTabHeader";
 import ItemsList from "./ItemsList";
-import { TrainStationPlatformItem } from "@/server/db/schemas/trainStations";
+import { handleGetPlatformItems } from "@/lib/actions/trainStations";
 
 export default async function PlatformAccordionTab({platformId}: {platformId: number}) {
 
-    const items: TrainStationPlatformItem[] = [];
+    const items = await handleGetPlatformItems(platformId);
     
     return (
         <>

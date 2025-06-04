@@ -205,44 +205,47 @@ export async function removeStationPlatform(platformId: number, ownerId: string)
     });
 }
 
-export async function addStationPlatformItem(platformId: number, itemId: string, rate: number) {
+export async function addStationPlatformItem(platformId: number, itemId: string, rate: number, ownerId: string) {
     const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
-
-    const platform = await db
-        .selectFrom('train_station_platform')
-        .select('owner_id')
-        .select('position')
-        .select('train_station_id')
-        .select('id')
-        .where('id','=',platformId)
-        .executeTakeFirst();
-
-    if (!platform) { throw new Error('Platform not found'); }
-    if (platform.owner_id !== owner.id) { throw new Error('Unauthorized'); }
 
     await db.insertInto('train_station_platform_item').values({
         item_id: itemId,
-        owner_id: platform.owner_id,
-        platform_id: platform.id,
+        owner_id: ownerId,
+        platform_id: platformId,
         rate: rate,
     }).execute();
 }
 
-export const getPlatformItems = unstable_cache(async (platformId: number) => {
-    const db = getDatabase();
-    return await db.selectFrom('train_station_platform_item').selectAll().where('platform_id','=',platformId).execute();
-}, ['items'], {tags: ['items']});
+export async function getStationPlatformItem(itemId: number, ownerId: string) {
+    return getDatabase()
+    .selectFrom('train_station_platform_item')
+    .selectAll()
+    .where('id','=',itemId)
+    .where('owner_id','=',ownerId)
+    .executeTakeFirst();
+}
 
-export const removeStationPlatformItem = async (platformId: number, itemId: number) => {
-    const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }    
+export async function getStationPlatformItems(platformId: number, ownerId: string) {
+    return getDatabase()
+    .selectFrom('train_station_platform_item')
+    .selectAll()
+    .where('platform_id','=',platformId)
+    .where('owner_id','=',ownerId)
+    .execute()
+}
 
-    const item = await db.selectFrom('train_station_platform_item').selectAll().where('id','=',itemId).executeTakeFirst();
-    if (!item) { throw new Error('Item not found'); }
-    if (item.owner_id !== owner.id) { throw new Error('Unauthorized'); }
+export const getCachedStationPlatformItems = (platformId: number, ownerId: string) => unstable_cache(
+    async (platformId, ownerId) => getStationPlatformItems(platformId, ownerId),
+    ['platform-items'],
+    {
+        tags: [`train-station-platform-items:${platformId}`]
+    }
+)(platformId, ownerId)
 
-    await db.deleteFrom('train_station_platform_item').where('id','=',itemId).execute();
+export const removeStationPlatformItem = async (itemId: number, ownerId: string) => {
+    return getDatabase()
+    .deleteFrom('train_station_platform_item')
+    .where('id','=',itemId)
+    .where('owner_id','=',ownerId)
+    .execute();
 }
