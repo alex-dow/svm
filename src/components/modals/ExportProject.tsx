@@ -12,14 +12,8 @@ export interface ExportProjectProps {
     projectId: number
 }
 export default function ExportProject({visible, onHide, projectId}: ExportProjectProps) {
-
-    const session = authClient.useSession();
-
     const onClick = async (e: React.MouseEvent) => {
         e.preventDefault();
-
-        if (!session.data) { redirect('/login')}
-        const ownerId = session.data.user.id;
 
         const project = await handleExportProject(projectId);
 

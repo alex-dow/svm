@@ -2,8 +2,9 @@
 
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
-import { createProject, deleteProject, exportProject, getCachedProject, getCachedProjects, getProject, updateProject } from "../services/projects";
+import { createProject, deleteProject, exportProject, getCachedProject, getCachedProjects, getProject, ImportProjectParameters, importSaveFileProject, updateProject } from "../services/projects";
 import { Project } from "@/server/db/schemas/projects";
+import { SaveFileTrain, SaveFileTrainStation } from "../types";
 
 export async function handleGetProjects() {
     const user = await getCurrentUser();
@@ -46,9 +47,27 @@ export async function handleRenameProject(projectName: string, projectId: number
     
 }
 
-
 export async function handleExportProject(projectId: number) {
     const user = await getCurrentUser();
     const project = exportProject(projectId, user.id);
     return project;
+}
+
+export interface HandleImportSaveFileProjectParameters {
+    projectName: string,
+    saveFileTrainStations: SaveFileTrainStation[],
+    saveFileTrains: SaveFileTrain[]
+}
+
+export async function handleImportSaveFileProject({projectName, saveFileTrainStations, saveFileTrains}: HandleImportSaveFileProjectParameters) {
+    const user = await getCurrentUser();
+    const projectId = await importSaveFileProject({
+        projectName,
+        ownerId: user.id,
+        saveFileTrains,
+        saveFileTrainStations
+    });
+    revalidateTag(`projects:${user.id}`)
+
+    return projectId;
 }

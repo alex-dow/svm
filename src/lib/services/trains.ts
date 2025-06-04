@@ -1,13 +1,11 @@
-'use server';
-
 import { getDatabase } from "@/server/db";
 import { getCurrentUser } from "./auth";
-import { TrainConsist } from "@/server/db/schemas/trains";
+import { Train } from "@/server/db/schemas/trains";
 import { unstable_cache } from "next/cache";
 
 export async function getTrains(projectId: number, ownerId: string) {
     return getDatabase()
-    .selectFrom('train_consist')
+    .selectFrom('train')
     .selectAll()
     .where('project_id','=',projectId)
     .where('owner_id','=',ownerId)
@@ -24,19 +22,39 @@ export const getCachedTrains = (projectId: number, ownerId: string) => unstable_
 
 export async function createTrain(projectId: number, name: string, ownerId: string) {
     return getDatabase()
-    .insertInto('train_consist')
+    .insertInto('train')
     .values({
         name,
         project_id: projectId,
-        owner_id: ownerId
+        owner_id: ownerId,
+        wagons: 0
     })
     .returningAll()
     .executeTakeFirst();
 }
 
+export async function createTrains(names: string[], projectId: number): Promise<Train[]> {
+
+    const db = getDatabase();
+    const owner = await getCurrentUser();
+    if (!owner) { throw new Error('Unauthorized'); }
+
+    const res = db.insertInto('train').values(
+        names.map((name) => ({
+            name,
+            owner_id: owner.id,
+            project_id: projectId,
+            wagons: 0
+        }))
+    ).returningAll().execute();
+    return res;
+}
+
+
+
 export async function deleteTrain(trainId: number, ownerId: string) {
     return getDatabase()
-    .deleteFrom('train_consist')
+    .deleteFrom('train')
     .where('id','=',trainId)
     .where('owner_id','=',ownerId)
     .execute();
@@ -44,7 +62,7 @@ export async function deleteTrain(trainId: number, ownerId: string) {
 
 export async function getTrain(trainId: number, ownerId: string) {
     return getDatabase()
-    .selectFrom('train_consist')
+    .selectFrom('train')
     .selectAll()
     .where('id','=',trainId)
     .where('owner_id','=',ownerId)
@@ -59,63 +77,15 @@ export const getCachedTrain = (trainId: number, ownerId: string) => unstable_cac
     }
 )(trainId, ownerId)
 
-export async function getTrainConsists(projectId: number): Promise<TrainConsist[]> {
+export async function updateTrain(train: Train) {
     const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
 
-    const res = await db.selectFrom('train_consist')
-        .selectAll()
-        .where('project_id','=',projectId)
-        .where('owner_id','=',owner.id)
-        .execute();
-    return res;
-}
-
-export async function createTrainConsist(name: string, projectId: number): Promise<TrainConsist | undefined> {
-    const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
-
-    const res = db.insertInto('train_consist').values({
-        name,
-        project_id: projectId,
-        owner_id: owner.id
+    return db.updateTable('train').set({
+        name: train.name,
+        wagons: train.wagons
     })
     .returningAll()
+    .where('id','=',train.id)
     .executeTakeFirst();
-    return res;
 }
 
-export async function createTrainConsists(names: string[], projectId: number): Promise<TrainConsist[]> {
-
-    const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
-
-    const res = db.insertInto('train_consist').values(
-        names.map((name) => ({
-            name,
-            owner_id: owner.id,
-            project_id: projectId
-        }))
-    ).returningAll().execute();
-    return res;
-}
-
-export async function deleteTrainConsist(consistId: number) {
-    const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
-
-    const consist = await db.selectFrom('train_consist').select('owner_id').where('id','=',consistId).executeTakeFirst();
-    if (!consist) {
-        throw new Error('Unknown train consist');
-    }
-
-    if (consist.owner_id != owner.id) {
-        throw new Error('Forbidden');
-    }
-
-    await db.deleteFrom('train_consist').where('id','=',consistId).execute();
-}

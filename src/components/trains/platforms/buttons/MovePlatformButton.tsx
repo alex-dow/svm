@@ -1,6 +1,6 @@
 'use client';
 
-import { repositionStationPlatform } from "@/lib/services/stationPlatforms";
+import { handleMovePlatform } from "@/lib/actions/trainStations";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
@@ -20,10 +20,9 @@ export function MovePlatformButton(props: MovePlatformButtonProps) {
 
     const onClick = async (e: React.MouseEvent) => {
         e.stopPropagation();
-        const position = (props.direction == 'up') ? props.position - 1 : props.position + 1;
+        
         try {
-            console.log('repositionStationPlatform', props.platformId, position);
-            await repositionStationPlatform(props.platformId, position);
+            await handleMovePlatform(props.platformId, props.direction);
         } catch (err) {
             console.error(err);
             if (err instanceof Error) {

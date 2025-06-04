@@ -1,5 +1,5 @@
 'use client';
-import { removeStationPlatformItem } from "@/lib/services/stationPlatforms";
+//import { removeStationPlatformItem } from "@/lib/services/stationPlatforms";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
@@ -10,7 +10,7 @@ export function DeleteItemButton({platformId, itemId}: {platformId: number, item
     const onClick = async (e: React.MouseEvent) => {
         e.preventDefault();
         try {
-            await removeStationPlatformItem(platformId, itemId);
+  //          await removeStationPlatformItem(platformId, itemId);
         } catch (err) {
             if (err instanceof Error) {
                 toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message });

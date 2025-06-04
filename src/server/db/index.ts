@@ -2,7 +2,7 @@ import { Kysely, PostgresDialect, SqliteDialect } from "kysely";
 import SQLLite from 'better-sqlite3';
 import { ProjectTable } from "./schemas/projects";
 import { TrainStationPlatformItemTable, TrainStationPlatformTable, TrainStationTable } from "./schemas/trainStations";
-import { TrainConsistTable, TrainTimetableStopTable, TrainWagonTable } from './schemas/trains';
+import { TrainTable, TrainTimetableStopTable } from './schemas/trains';
 import { AccountTable, SessionTable, UserTable, VerificationTable } from "./schemas/users";
 import { Pool } from 'pg';
 
@@ -11,9 +11,8 @@ export interface SVMDatabase {
     train_station: TrainStationTable,
     train_station_platform: TrainStationPlatformTable
     train_station_platform_item: TrainStationPlatformItemTable,
-    train_consist: TrainConsistTable,
+    train: TrainTable,
     train_timetable: TrainTimetableStopTable,
-    train_wagon: TrainWagonTable,
     user: UserTable,
     account: AccountTable,
     session: SessionTable,

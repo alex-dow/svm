@@ -7,12 +7,9 @@ import Working from "./ImportSaveFile/Working";
 import { Error } from "./ImportSaveFile/Error";
 import SelectSaveFile from "./ImportSaveFile/SelectSaveFile";
 import SelectImportableItems from "./ImportSaveFile/SelectImportableItems";
-import { createProject } from "@/lib/services/projects";
-import { importStations } from "@/lib/services/stations";
 import { redirect, useRouter } from "next/navigation";
-import { createTrainConsist } from "@/lib/services/trains";
-import { addTrainWagons } from "@/lib/services/trainWagons";
 import { authClient } from "@/lib/auth-client";
+import { handleImportSaveFileProject } from "@/lib/actions/projects";
 
 export interface ImportSaveFileProps {
     visible: boolean,
@@ -70,10 +67,10 @@ export default function ImportSaveFile({visible, onHide, header}: ImportSaveFile
                 setSaveName(e.data.data as string);
             } else if (e.data.type === 'train-stations') {
                 console.log('worker message:', e);
-                setTrainStations(e.data.data as {id: string, label: string, platforms: SaveFilePlatform[]}[]);
+                setTrainStations(e.data.data as SaveFileTrainStation[]);
             } else if (e.data.type === 'trains') {
                 console.log('worker message:', e);
-                setTrains(e.data.data as {id: string, label: string, wagons: []}[]);
+                setTrains(e.data.data as SaveFileTrain[]);
             } else if (e.data.type === 'finished') {
                 setPhase('parsing-finished');
             } else if (e.data.type === 'error') {
@@ -110,29 +107,13 @@ export default function ImportSaveFile({visible, onHide, header}: ImportSaveFile
         setError(false);
 
         try {
-            const project = await createProject(saveName, session.data.user.id);
-            if (!project) {
-                console.error('failed to create project');
-                setError(true);
-                setPhase('error');
-                return;
-            }
-
-            await importStations(items.trainStations, project.id);
-
-            for (let i = 0; i < items.trains.length; i++) {
-                const trainName = items.trains[i].label;
-                const train = await createTrainConsist(trainName, project.id);
-                if (!train) {
-                    console.error('failed to create train');
-                    setError(true);
-                    setPhase('error');
-                    return;
-                }
-
-                await addTrainWagons(train.id, items.trains[i].wagons);
-            }
-            router.push(`/projects/${project.id}`);
+            const projectId = await handleImportSaveFileProject({
+                projectName: saveName,
+                saveFileTrains: items.trains,
+                saveFileTrainStations: items.trainStations
+            });
+            
+            router.push(`/projects/${projectId}`);
         } catch (err) {
             console.error(err);
         }

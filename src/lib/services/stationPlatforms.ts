@@ -1,31 +1,33 @@
-'use server';
 import { getDatabase } from "@/server/db";
 import { getCurrentUser } from "./auth";
-import { revalidateTag, unstable_cache } from "next/cache";
-import { CreateTrainStationPlatform } from "@/server/db/schemas/trainStations";
+import { unstable_cache } from "next/cache";
 
-
-
-export async function getStationPlatforms(stationId: number, ownerId: string) {
-    const db = getDatabase();
-
-    return await db
-        .selectFrom('train_station_platform')
-        .selectAll()
-        .where('train_station_id','=',stationId)
-        .where('owner_id','=',ownerId)
-        .orderBy('position','asc')
-        .execute();
+export async function getTrainStationPlatforms(stationId: number, ownerId: string) {
+    return getDatabase()
+    .selectFrom('train_station_platform')
+    .selectAll()
+    .where('train_station_id','=',stationId)
+    .where('owner_id','=',ownerId)
+    .orderBy('position','asc')
+    .execute();
 }
 
-export const getCachedStationPlatforms = unstable_cache(
-    async (stationId: number, ownerId: string) => getStationPlatforms(stationId, ownerId),
-    ['station-platforms'],
+export const getCachedTrainStationPlatforms = (trainStationId: number, ownerId: string) => unstable_cache(
+    async (stationId, ownerId) => getTrainStationPlatforms(stationId, ownerId),
+    ['train-station-platfroms'],
     {
-        tags: ['station-platforms']
+        tags: [`train-station-platforms:${trainStationId}`]
     }
-);
+)(trainStationId, ownerId);
 
+export async function getTrainStationPlatform(platformId: number, ownerId: string) {
+    return getDatabase()
+    .selectFrom('train_station_platform')
+    .selectAll()
+    .where('id','=',platformId)
+    .where('owner_id','=',ownerId)
+    .executeTakeFirst();
+}
 
 export async function getLastPlatformPosition(stationId: number) {
     const db = getDatabase();
@@ -39,41 +41,23 @@ export async function getLastPlatformPosition(stationId: number) {
     return lastPlatform?.position || 0;
 }
 
-export async function addStationPlatforms(stationId: number, platforms: number) {
-    if (platforms == 0) {
-        return [];
-    }
+export async function countStationPlatforms(stationId: number) {
     const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) throw new Error('Unauthorized');
-
-    const lastPlatformPosition = await getLastPlatformPosition(stationId);
-    
-    const platformValues: CreateTrainStationPlatform[] = [];
-    for (let i = 1; i <= platforms; i++) {
-        platformValues.push({
-            mode: 'loading',
-            owner_id: owner.id,
-            position: lastPlatformPosition + i,
-            train_station_id: stationId
-        })
-    }
     
     const res = await db
-        .insertInto('train_station_platform')
-        .values(platformValues)
-        .returningAll()
-        .execute();
-
-    revalidateTag('station-platforms');
-    return res;
-    
+        .selectFrom('train_station_platform')
+        .select(({fn}) => {
+            return [
+                fn.count<number>('id').as('platform_count')
+            ]
+        })
+        .where('train_station_id','=',stationId)
+        .executeTakeFirst();
+    return res?.platform_count || 0;       
 }
 
-export async function addStationPlatform(stationId: number) {
+export async function addStationPlatform(stationId: number, ownerId: string) {
     const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
 
     const lastPlatform = await db
         .selectFrom('train_station_platform')
@@ -90,45 +74,16 @@ export async function addStationPlatform(stationId: number) {
         .insertInto('train_station_platform').values({
             position,
             train_station_id: stationId,
-            owner_id: owner.id,
+            owner_id: ownerId,
             mode: 'loading',
         })
         .returningAll()
         .executeTakeFirst();
 
-    revalidateTag('station-platforms');
+    
     return platform;
 }
 
-export async function getStationPlatformProjectId(platformId: number) {
-    const db = getDatabase();
-    const platform = await db
-        .selectFrom('train_station_platform')
-        .leftJoin('train_station', 'train_station.id', 'train_station_platform.train_station_id')
-        .select('train_station_id')
-        .select('train_station.project_id')
-        .where('id','=',platformId)
-        .executeTakeFirst();
-    return platform?.project_id;
-}
-
-export async function countStationPlatforms(stationId: number) {
-    const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
-    
-    const res = await db
-        .selectFrom('train_station_platform')
-        .select(({fn}) => {
-            return [
-                fn.count<number>('id').as('platform_count')
-            ]
-        })
-        .where('owner_id','=',owner.id)
-        .where('train_station_id','=',stationId)
-        .executeTakeFirst();
-    return res?.platform_count || 0;       
-}
 
 export async function repositionStationPlatform(platformId: number, newPosition: number) {
 
@@ -183,8 +138,19 @@ export async function repositionStationPlatform(platformId: number, newPosition:
     })
     .where('id', '=', platformId).execute();
 
-    revalidateTag('station-platforms');
 
+}
+
+export async function setPlatformMode(platformId: number, mode: 'loading' | 'unloading', ownerId: string) {
+    return getDatabase()
+    .updateTable('train_station_platform')
+    .set({
+        mode
+    })
+    .where('id','=',platformId)
+    .where('owner_id','=',ownerId)
+    .returningAll()
+    .executeTakeFirstOrThrow();
 }
 
 export async function toggleStationPlatformMode(platformId: number) {
@@ -211,13 +177,10 @@ export async function toggleStationPlatformMode(platformId: number) {
         .where('id','=',platformId)
         .execute();
 
-    revalidateTag('station-platforms');
 }
 
-export async function removeStationPlatform(platformId: number) {
+export async function removeStationPlatform(platformId: number, ownerId: string) {
     const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
 
     const platform = await db
         .selectFrom('train_station_platform')
@@ -225,10 +188,10 @@ export async function removeStationPlatform(platformId: number) {
         .select('position')
         .select('train_station_id')
         .where('id','=',platformId)
+        .where('owner_id','=',ownerId)
         .executeTakeFirst();
 
     if (!platform) { throw new Error('Platform not found'); }
-    if (platform.owner_id !== owner.id) { throw new Error('Unauthorized'); }
 
     await db.transaction().execute(async (tx) => {
         await tx.deleteFrom('train_station_platform').where('id','=',platformId).execute();
@@ -240,7 +203,6 @@ export async function removeStationPlatform(platformId: number) {
             .where('train_station_id','=',platform.train_station_id)
             .execute();
     });
-    revalidateTag('station-platforms');
 }
 
 export async function addStationPlatformItem(platformId: number, itemId: string, rate: number) {
@@ -266,7 +228,6 @@ export async function addStationPlatformItem(platformId: number, itemId: string,
         platform_id: platform.id,
         rate: rate,
     }).execute();
-    revalidateTag('items');
 }
 
 export const getPlatformItems = unstable_cache(async (platformId: number) => {
@@ -284,5 +245,4 @@ export const removeStationPlatformItem = async (platformId: number, itemId: numb
     if (item.owner_id !== owner.id) { throw new Error('Unauthorized'); }
 
     await db.deleteFrom('train_station_platform_item').where('id','=',itemId).execute();
-    revalidateTag('items');
 }

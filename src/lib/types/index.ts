@@ -8,10 +8,7 @@ export interface CollectedItems {
     trainStations: {[key: string]: string};
 }
 
-export interface SelectedItemsForImport {
-    trainStations: {id: string, label: string, platforms: SaveFilePlatform[]}[]
-    trains: {id: string, label: string, wagons: number}[]
-}
+
 
 export interface SaveFileParserEvent<T> {
     type: SaveFileParserEventType,
@@ -43,5 +40,10 @@ export interface SaveFileTrainStation {
 export interface SaveFileTrain {
     id: string,
     label: string,
-    wagons: string[]
+    wagons: number
+}
+
+export interface SelectedItemsForImport {
+    trainStations: SaveFileTrainStation[]
+    trains: SaveFileTrain[]
 }

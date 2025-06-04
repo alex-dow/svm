@@ -1,8 +1,5 @@
 import { Splitter, SplitterPanel } from "primereact/splitter";
 import { Suspense } from "react";
-import { auth } from "@/lib/auth";
-import { headers } from "next/headers";
-import { redirect } from "next/navigation";
 import Loading from "@/components/Loading";
 import TrainStationsList from "@/components/trains/TrainStationsList";
 
@@ -14,17 +11,13 @@ export default async function TrainsRootLayout({
   params: Promise<{projectId: string}>
 }>) {
     const { projectId } = await params;
-    const session = await auth.api.getSession({headers: await headers()});
-    if (!session) { redirect('/login')}
-    
-   
 
   return (
     <Splitter className="flex flex-1">
       <SplitterPanel size={25} minSize={25} className="relative">
         <div className="absolute top-0 left-0 right-0 bottom-0 overflow-y-auto">
           <Suspense fallback={(<Loading/>)}>
-            <TrainStationsList projectId={parseInt(projectId)} ownerId={session.user.id} />
+            <TrainStationsList projectId={parseInt(projectId)} />
           </Suspense>
         </div>
       </SplitterPanel>

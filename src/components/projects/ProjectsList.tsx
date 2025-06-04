@@ -1,9 +1,8 @@
+import { Project } from "@/server/db/schemas/projects";
 import ProjectListItem from "./ProjectListItem";
-import { handleGetProjects } from "@/lib/actions/projects";
 
-export default async function ProjectsList() {
-    const projects = await handleGetProjects();
-    
+export default async function ProjectsList({projects}: {projects: Project[]}) {
+   
     return (
         <>
         {projects.map((project) => (

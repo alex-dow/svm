@@ -1,44 +1,7 @@
 import { getDatabase } from "@/server/db";
 import { getCurrentUser } from "./auth";
-import { CreateTrainStation, CreateTrainStationPlatform } from "@/server/db/schemas/trainStations";
-import { SaveFileTrainStation } from "../types";
+import { CreateTrainStation } from "@/server/db/schemas/trainStations";
 import { unstable_cache } from "next/cache";
-
-export async function importStations(stations: SaveFileTrainStation[], projectId: number, ownerId: string) {
-    const db = getDatabase();
-    
-    const trainStations = await db
-        .insertInto('train_station')
-        .values(stations.map((s) => ({name: s.label, owner_id: ownerId, project_id: projectId})))
-        .returningAll()
-        .execute();
-
-    const platforms = stations.reduce((a, s, idx) => {
-
-        if (s.platforms.length > 0) {
-            for (let i = 1; i <= s.platforms.length; i++) {
-                a.push({
-                    mode: s.platforms[i-1].mode ? 'loading' : 'unloading',
-                    owner_id: ownerId,
-                    train_station_id: trainStations[idx].id,
-                    position: i
-                });
-            }
-        }
-
-        return a;
-    }, [] as CreateTrainStationPlatform[])
-
-    if (platforms.length > 0) {
-        await db
-            .insertInto('train_station_platform')
-            .values(platforms)
-            .returningAll()
-            .execute();
-    }
-
-    return trainStations;
-}
 
 export async function getTrainStations(projectId: number, ownerId: string) {
     return getDatabase()

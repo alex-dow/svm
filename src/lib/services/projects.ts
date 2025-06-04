@@ -1,8 +1,9 @@
 import { getDatabase } from "@/server/db";
 import { unstable_cache } from "next/cache";
 import { getTrainStations } from "./stations";
-import { TrainStationPlatform, TrainStationPlatformItem } from "@/server/db/schemas/trainStations";
-import { Project, UpdateProject } from "@/server/db/schemas/projects";
+import { CreateTrainStationPlatform, TrainStationPlatform, TrainStationPlatformItem } from "@/server/db/schemas/trainStations";
+import { Project } from "@/server/db/schemas/projects";
+import { SaveFileTrain, SaveFileTrainStation } from "../types";
 
 export async function createProject(projectName: string, ownerId: string) {
     const db = getDatabase();
@@ -19,8 +20,7 @@ export async function createProject(projectName: string, ownerId: string) {
 export async function getProjects(ownerId: string) {
     return getDatabase()
         .selectFrom('project')
-        .select('id')
-        .select('name')
+        .selectAll()
         .where('owner_id', '=', ownerId)
         .execute();
 }
@@ -116,4 +116,63 @@ export const exportProject = async (projectId: number, ownerId: string) => {
         platforms,
         platformItems
     };
+}
+
+export interface ImportProjectParameters {
+    projectName: string,
+    ownerId: string,
+    saveFileTrainStations: SaveFileTrainStation[],
+    saveFileTrains: SaveFileTrain[]
+}
+
+export const importSaveFileProject = async ({projectName, ownerId, saveFileTrainStations, saveFileTrains}: ImportProjectParameters) => {
+
+    const db = getDatabase();
+
+    return db.transaction().execute(async (trx) => {
+
+        const project = await trx
+        .insertInto('project')
+        .values({
+            name: projectName,
+            owner_id: ownerId
+        })
+        .returning('id')
+        .executeTakeFirstOrThrow();
+
+        const trainStations = await trx
+            .insertInto('train_station')
+            .values(saveFileTrainStations.map((s) => ({name: s.label, owner_id: ownerId, project_id: project.id})))
+            .returningAll()
+            .execute();
+        
+        const platforms = saveFileTrainStations.reduce((a, s, idx) => {
+        
+            if (s.platforms.length > 0) {
+                for (let i = 1; i <= s.platforms.length; i++) {
+                    a.push({
+                        mode: s.platforms[i-1].mode ? 'loading' : 'unloading',
+                        owner_id: ownerId,
+                        train_station_id: trainStations[idx].id,
+                        position: i
+                    });
+                }
+            }
+        
+            return a;
+        }, [] as CreateTrainStationPlatform[])
+        
+        if (platforms.length > 0) {
+            await trx
+                .insertInto('train_station_platform')
+                .values(platforms)
+                .returningAll()
+                .execute();
+        }
+
+        return project.id;
+
+    });
+
+    
 }

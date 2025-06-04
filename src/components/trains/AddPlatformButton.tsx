@@ -1,5 +1,5 @@
 'use client';
-import { addStationPlatform } from "@/lib/services/stationPlatforms";
+import { handleAddPlatform } from "@/lib/actions/trainStations";
 import { Button } from "primereact/button";
 
 export interface AddPlatformButtonProps {
@@ -11,7 +11,7 @@ export default function AddPlatformButton({stationId}: AddPlatformButtonProps) {
     const onClick = async (e: React.MouseEvent) => {
         e.preventDefault();
         e.stopPropagation();
-        await addStationPlatform(stationId);
+        await handleAddPlatform(stationId);
     }
 
     return (

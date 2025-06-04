@@ -1,9 +1,8 @@
 import PlatformAccordionHeader from "@/components/trains/platforms/PlatformAccordionHeader";
 import PlatformAccordionTab from "@/components/trains/platforms/PlatformAccordionTab";
 import StationPageHeader from "@/components/trains/StationPageHeader";
+import { handleGetStationPlatforms, handleGetTrainStation } from "@/lib/actions/trainStations";
 import { auth } from "@/lib/auth";
-import { getCachedStationPlatforms } from "@/lib/services/stationPlatforms";
-import { getCachedTrainStation } from "@/lib/services/stations";
 import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { Accordion, AccordionTab } from "primereact/accordion";
@@ -26,9 +25,9 @@ export default async function StationsListPage({
   const stationIdInt = parseInt(stationId);
 
   const [ trainStation, platforms ] = await Promise.all([
-    getCachedTrainStation(stationIdInt, session.user.id),
-    getCachedStationPlatforms(stationIdInt, session.user.id),
-    
+    handleGetTrainStation(stationIdInt),
+    handleGetStationPlatforms(stationIdInt)
+   
   ])
 
 

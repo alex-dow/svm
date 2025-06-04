@@ -1,7 +1,7 @@
 "use client";
 
 import ButtonWithBusyModal from "@/components/buttons/ButtonWithBusyModal";
-import { removeStationPlatform } from "@/lib/services/stationPlatforms";
+import { handleDeleteStationPlatform } from "@/lib/actions/trainStations";
 
 export interface DeletePlatformButtonProps {
   platformId: number;
@@ -11,7 +11,7 @@ export function DeletePlatformButton({platformId}: DeletePlatformButtonProps) {
   const onClick = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    await removeStationPlatform(platformId);
+    await handleDeleteStationPlatform(platformId);
   }
 
   return (

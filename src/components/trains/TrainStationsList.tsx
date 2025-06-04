@@ -1,9 +1,9 @@
-import { getCachedTrainStations } from "@/lib/services/stations";
 import { TrainStationsListItem } from "./TrainStationsListItem";
+import { handleGetTrainStations } from "@/lib/actions/trainStations";
 
-export default async function TrainStationsList({projectId, ownerId}: {projectId: number, ownerId: string}) {
+export default async function TrainStationsList({projectId}: {projectId: number}) {
     
-    const trainStations = await getCachedTrainStations(projectId, ownerId);
+    const trainStations = await handleGetTrainStations(projectId);
 
     return (
         <div className="flex min-h-full" style={{height: 'fit-content'}}>

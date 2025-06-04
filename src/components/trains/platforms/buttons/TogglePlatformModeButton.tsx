@@ -1,18 +1,18 @@
 'use client';
 
-import { toggleStationPlatformMode } from "@/lib/services/stationPlatforms";
+import { handleSetPlatformMode } from "@/lib/actions/trainStations";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useRef } from "react";
 
-export function TogglePlatformModeButton({platformId}: {platformId: number}) {
+export function TogglePlatformModeButton({platformId, mode}: {platformId: number, mode: 'loading' | 'unloading'}) {
 
     const toast = useRef<Toast>(null);
 
     const onClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         try {
             e.stopPropagation();
-            await toggleStationPlatformMode(platformId);
+            await handleSetPlatformMode(platformId, (mode === 'loading') ? 'unloading' : 'loading');
         } catch (err) {
             console.error(err);
             if (err instanceof Error) {

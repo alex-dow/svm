@@ -1,6 +1,6 @@
 'use client';
 import ItemModal from "@/components/ItemModal";
-import { addStationPlatformItem } from "@/lib/services/stationPlatforms";
+//import { addStationPlatformItem } from "@/lib/services/stationPlatforms";
 import { Button } from "primereact/button";
 import { useState } from "react";
     
@@ -16,7 +16,7 @@ export default function PlatformAccordionTabHeader({platformId, onChange}: {plat
             visible={showItemModal} 
             onHide={() => setShowItemModal(false)} 
             onSave={({item, rate}) => {
-                addStationPlatformItem(platformId, item.className, rate);
+                //addStationPlatformItem(platformId, item.className, rate);
                 if (onChange) { onChange() }
             }}
         />

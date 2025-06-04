@@ -2,25 +2,16 @@ import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 
 
-export interface TrainConsistTable {
+export interface TrainTable {
     id: Generated<number>;
     name: string;
     project_id: number;
     owner_id: string;
+    wagons: number;
 }
-export type TrainConsist = Selectable<TrainConsistTable>;
-export type CreateTrainConsist = Insertable<TrainConsistTable>;
-export type UpdateTrainConsist = Updateable<TrainConsistTable>;
-
-export interface TrainWagonTable {
-    id: Generated<number>;
-    position: number;
-    consist_id: number;
-    owner_id: string;
-}
-export type TrainWagon = Selectable<TrainWagonTable>;
-export type CreateTrainWagon = Insertable<TrainWagonTable>;
-export type UpdateTrainWagon = Updateable<TrainWagonTable>;
+export type Train = Selectable<TrainTable>;
+export type CreateTrain = Insertable<TrainTable>;
+export type UpdateTrain = Updateable<TrainTable>;
 
 export interface TrainTimetableStopTable {
     id: Generated<number>;
