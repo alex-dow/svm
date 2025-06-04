@@ -67,5 +67,6 @@ export async function handleSetPlatformMode(platformId: number, mode: 'loading' 
     if (!platform) throw new Error('Platform not found');
 
     await setPlatformMode(platformId, mode, user.id);
-    revalidateTag(`train-stations-platforms:${platform.train_station_id}`);
+
+    revalidateTag(`train-station-platforms:${platform.train_station_id}`);
 }

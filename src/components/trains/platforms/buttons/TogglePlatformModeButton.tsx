@@ -11,8 +11,10 @@ export function TogglePlatformModeButton({platformId, mode}: {platformId: number
 
     const onClick = async (e: React.MouseEvent<HTMLButtonElement>) => {
         try {
+            e.preventDefault();
             e.stopPropagation();
-            await handleSetPlatformMode(platformId, (mode === 'loading') ? 'unloading' : 'loading');
+            const newMode = (mode === 'loading') ? 'unloading' : 'loading';
+            await handleSetPlatformMode(platformId, newMode);
         } catch (err) {
             console.error(err);
             if (err instanceof Error) {
@@ -34,7 +36,7 @@ export function TogglePlatformModeButton({platformId, mode}: {platformId: number
             size="small"
             icon="pi pi-arrow-right-arrow-left"
             className="p-1 pt-1.5 w-8"
-            title="Toggle platform mode"
+            title={(mode === 'loading') ? "Set platform mode to 'unloading'" : "Set platform mode to 'loading'"}
             onClick={onClick}
         />
         </>

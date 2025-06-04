@@ -1,7 +1,5 @@
 'use client';
 import { handleExportProject } from "@/lib/actions/projects";
-import { authClient } from "@/lib/auth-client";
-import { redirect } from "next/navigation";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 

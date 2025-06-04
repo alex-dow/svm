@@ -23,7 +23,7 @@ export default async function PlatformAccordionHeader({
       </div>
       
       <div className="flex gap-1">
-        <TogglePlatformModeButton platformId={platform.id}/>
+        <TogglePlatformModeButton platformId={platform.id} mode={platform.mode}/>
         <MovePlatformButton disabled={platform.position == totalPlatforms} direction="down" platformId={platform.id} position={platform.position}/>
         <MovePlatformButton disabled={platform.position == 1} direction="up" platformId={platform.id} position={platform.position}/>
         <DeletePlatformButton platformId={platform.id}/>

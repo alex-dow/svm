@@ -14,7 +14,7 @@ export async function getTrainStationPlatforms(stationId: number, ownerId: strin
 
 export const getCachedTrainStationPlatforms = (trainStationId: number, ownerId: string) => unstable_cache(
     async (stationId, ownerId) => getTrainStationPlatforms(stationId, ownerId),
-    ['train-station-platfroms'],
+    ['train-station-platforms'],
     {
         tags: [`train-station-platforms:${trainStationId}`]
     }
