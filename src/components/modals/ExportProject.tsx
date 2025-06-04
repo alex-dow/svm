@@ -1,0 +1,39 @@
+'use client';
+import { handleExportProject } from "@/lib/actions/projects";
+import { authClient } from "@/lib/auth-client";
+import { redirect } from "next/navigation";
+import { Button } from "primereact/button";
+import { Dialog } from "primereact/dialog";
+
+export interface ExportProjectProps {
+    visible: boolean,
+    onHide: () => void,
+    header?: React.ReactNode | string,
+    projectId: number
+}
+export default function ExportProject({visible, onHide, projectId}: ExportProjectProps) {
+
+    const session = authClient.useSession();
+
+    const onClick = async (e: React.MouseEvent) => {
+        e.preventDefault();
+
+        if (!session.data) { redirect('/login')}
+        const ownerId = session.data.user.id;
+
+        const project = await handleExportProject(projectId);
+
+        const el = document.getElementById('project-export-download-link');
+        el?.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(project,null,4)));
+        el?.setAttribute('download','SVM - ' + project.project.name);
+        el?.click();
+
+    }
+
+    return (
+        <Dialog visible={visible} onHide={onHide}>
+            <a id="project-export-download-link" className="hidden"/>
+            <Button onClick={onClick}>Export Project</Button>
+        </Dialog>
+    )
+}

@@ -1,4 +1,3 @@
-//import { ObjectProperty, Parser, SatisfactorySave, SaveComponent, SaveEntity, TextProperty } from "@/lib/satisfactory/parser";
 import { BoolProperty, ObjectProperty, Parser, SatisfactorySave, SaveComponent, SaveEntity, TextProperty } from "@etothepii/satisfactory-file-parser";
 import { getErrorMessage, sendEvent } from "./base";
 import { SaveFilePlatform } from "@/lib/types";
@@ -227,8 +226,6 @@ export function buildStation(station: SaveEntity | SaveComponent, platformConnec
     const connectionId = id + '.PlatformConnection0';
 
     const stationPlatforms = getStationPlatforms(connectionId, platformConnections, platforms);
-
-    console.log('station platforms:', stationPlatforms);
 
     return { id, label, platforms: stationPlatforms };
 }

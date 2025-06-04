@@ -1,7 +1,7 @@
 import DeleteProjectButton from "@/components/projects/DeleteProjectButton";
-import { getProject } from "@/lib/services/projects";
+import ExportProjectButton from "@/components/projects/ExportProjectButton";
+import { handleGetProject } from "@/lib/actions/projects";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 
 export default async function ProjectRootLayout({
   children,
@@ -13,10 +13,7 @@ export default async function ProjectRootLayout({
     const { projectId } = await params;
     const projectIdInt = parseInt(projectId);
 
-    const project = await getProject(projectIdInt);
-    if (!project) {
-        notFound();
-    }
+    const project = await handleGetProject(projectIdInt);
 
   return (
     <>
@@ -25,8 +22,10 @@ export default async function ProjectRootLayout({
             <Link href={`/projects/${projectId}/trains`}>Trains</Link>
             <Link href={`/projects/${projectId}/trucks`}>Trucks</Link>
             <Link href={`/projects/${projectId}/drones`}>Drones</Link>
-            <div className="flex-1 text-right">
+            <div className="justify-self-end flex gap-2">
+              <ExportProjectButton projectId={projectIdInt}/>
               <DeleteProjectButton projectId={projectIdInt}/>
+              
             </div>
         </div>
         {children}

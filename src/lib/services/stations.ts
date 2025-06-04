@@ -1,18 +1,15 @@
-'use server';
-
 import { getDatabase } from "@/server/db";
 import { getCurrentUser } from "./auth";
 import { CreateTrainStation, CreateTrainStationPlatform } from "@/server/db/schemas/trainStations";
-import { SaveFilePlatform } from "../types";
+import { SaveFileTrainStation } from "../types";
+import { unstable_cache } from "next/cache";
 
-export async function importStations(stations: {id: string, label: string, platforms: SaveFilePlatform[]}[], projectId: number) {
+export async function importStations(stations: SaveFileTrainStation[], projectId: number, ownerId: string) {
     const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
     
     const trainStations = await db
         .insertInto('train_station')
-        .values(stations.map((s) => ({name: s.label, owner_id: owner.id, project_id: projectId})))
+        .values(stations.map((s) => ({name: s.label, owner_id: ownerId, project_id: projectId})))
         .returningAll()
         .execute();
 
@@ -22,7 +19,7 @@ export async function importStations(stations: {id: string, label: string, platf
             for (let i = 1; i <= s.platforms.length; i++) {
                 a.push({
                     mode: s.platforms[i-1].mode ? 'loading' : 'unloading',
-                    owner_id: owner.id,
+                    owner_id: ownerId,
                     train_station_id: trainStations[idx].id,
                     position: i
                 });
@@ -43,21 +40,23 @@ export async function importStations(stations: {id: string, label: string, platf
     return trainStations;
 }
 
-export async function getTrainStations(projectId: number) {
-    const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
-
-    const stations = await db
-        .selectFrom('train_station')
-        .select('id')
-        .select('name')
-        .where('project_id', '=', projectId)
-        .where('owner_id', '=', owner.id)
-        .execute();
-
-    return stations;
+export async function getTrainStations(projectId: number, ownerId: string) {
+    return getDatabase()
+    .selectFrom('train_station')
+    .select('id')
+    .select('name')
+    .where('project_id', '=', projectId)
+    .where('owner_id', '=', ownerId)
+    .execute();
 }
+
+export const getCachedTrainStations = (projectId: number, ownerId: string) => unstable_cache(
+    async (projectId: number, ownerId: string) => getTrainStations(projectId, ownerId),
+    ['train-stations'],
+    { 
+        tags: [`train-stations:${projectId}`,`train-stations:${projectId}:${ownerId}`]
+    }
+)(projectId, ownerId);
 
 export async function createTrainStation(stationName: string, projectId: number) {
     const db = getDatabase();
@@ -104,14 +103,26 @@ export async function deleteTrainStation(stationId: number) {
     await db.deleteFrom('train_station').where('id','=',stationId).execute();
 }
 
-export async function getTrainStation(stationId: number) {
+export async function getTrainStation(stationId: number, ownerId: string) {
     const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
 
-    const station = await db.selectFrom('train_station').selectAll().where('id','=',stationId).executeTakeFirst();
+    const station = await db
+        .selectFrom('train_station')
+        .selectAll()
+        .where('id','=',stationId)
+        .where('owner_id','=',ownerId)
+        .executeTakeFirst();
     if (!station) { throw new Error('Station not found'); }
-    if (station.owner_id !== owner.id) { throw new Error('Unauthorized'); }
+    if (station.owner_id !== ownerId) { throw new Error('Unauthorized'); }
 
     return station;
 }
+
+export const getCachedTrainStation = (stationId: number, ownerId: string) => unstable_cache(
+    async (stationId: number, ownerId: string) => getTrainStation(stationId, ownerId),
+    ['train-station'],
+    {
+        tags: [`train-station:${stationId}`,`train-station:${stationId}:${ownerId}`]
+    }
+)(stationId, ownerId);
+

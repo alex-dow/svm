@@ -5,8 +5,8 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { useRef, useState } from "react";
 import { authClient } from "@/lib/auth-client";
-import { createProject } from "@/lib/services/projects";
 import { Toast } from "primereact/toast";
+import { handleCreateProject } from "@/lib/actions/projects";
 
 export default function NewProjectModal({visible, onHide}: {visible: boolean, onHide: () => void}) {
 
@@ -22,11 +22,10 @@ export default function NewProjectModal({visible, onHide}: {visible: boolean, on
         
         try {
             if (!session.data) {
-                console.error('not logged in');
-                router.push('/');
+                router.push('/login');
             } else {
             
-                const newProject = await createProject(projectName);
+                const newProject = await handleCreateProject(projectName);
                 router.push('/projects/' + newProject?.id);
             }
         } catch (err) {

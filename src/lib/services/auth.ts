@@ -8,7 +8,7 @@ export async function getCurrentUser() {
         headers: await headers(),
     });
     if (!session) {
-        return null;
+        throw new Error('unauthorized');
     }
     return session.user;
 }

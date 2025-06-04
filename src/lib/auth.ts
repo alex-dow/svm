@@ -3,6 +3,12 @@ import { getDatabase } from "@/server/db";
 import { username } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 const options: BetterAuthOptions = {
+    session: {
+        cookieCache: {
+            enabled: true,
+            maxAge: 5 * 60 // Seconds
+        }
+    },
     plugins: [
         username(),
         nextCookies()

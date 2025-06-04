@@ -1,24 +1,31 @@
 'use server';
 import { getDatabase } from "@/server/db";
 import { getCurrentUser } from "./auth";
-import { revalidatePath, revalidateTag, unstable_cache } from "next/cache";
+import { revalidateTag, unstable_cache } from "next/cache";
 import { CreateTrainStationPlatform } from "@/server/db/schemas/trainStations";
 
 
 
-export async function getStationPlatforms(stationId: number) {
+export async function getStationPlatforms(stationId: number, ownerId: string) {
     const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
 
     return await db
         .selectFrom('train_station_platform')
         .selectAll()
         .where('train_station_id','=',stationId)
-        .where('owner_id','=',owner.id)
+        .where('owner_id','=',ownerId)
         .orderBy('position','asc')
         .execute();
 }
+
+export const getCachedStationPlatforms = unstable_cache(
+    async (stationId: number, ownerId: string) => getStationPlatforms(stationId, ownerId),
+    ['station-platforms'],
+    {
+        tags: ['station-platforms']
+    }
+);
+
 
 export async function getLastPlatformPosition(stationId: number) {
     const db = getDatabase();
@@ -57,6 +64,8 @@ export async function addStationPlatforms(stationId: number, platforms: number) 
         .values(platformValues)
         .returningAll()
         .execute();
+
+    revalidateTag('station-platforms');
     return res;
     
 }
@@ -87,6 +96,7 @@ export async function addStationPlatform(stationId: number) {
         .returningAll()
         .executeTakeFirst();
 
+    revalidateTag('station-platforms');
     return platform;
 }
 
@@ -172,7 +182,8 @@ export async function repositionStationPlatform(platformId: number, newPosition:
         position: newPosition
     })
     .where('id', '=', platformId).execute();
-    revalidatePath('/projects/' + platform.project_id + '/trains/stations/' + platform.train_station_id);
+
+    revalidateTag('station-platforms');
 
 }
 
@@ -200,7 +211,7 @@ export async function toggleStationPlatformMode(platformId: number) {
         .where('id','=',platformId)
         .execute();
 
-    revalidatePath('/projects/' + platform.project_id + '/trains/stations/' + platform.train_station_id);
+    revalidateTag('station-platforms');
 }
 
 export async function removeStationPlatform(platformId: number) {
@@ -229,6 +240,7 @@ export async function removeStationPlatform(platformId: number) {
             .where('train_station_id','=',platform.train_station_id)
             .execute();
     });
+    revalidateTag('station-platforms');
 }
 
 export async function addStationPlatformItem(platformId: number, itemId: string, rate: number) {

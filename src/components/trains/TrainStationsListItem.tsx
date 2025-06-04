@@ -1,13 +1,13 @@
 import NavLink from "../layout/NavLink";
 import DeleteStationButton from "./DeleteStationButton";
 
-export interface StationNavListItemProps {
+export interface TrainStationsListItemProps {
     stationName: string,
     stationId: number,
     projectId: number
 };
 
-export async function StationNavListItem({stationName, stationId, projectId}: StationNavListItemProps) {
+export async function TrainStationsListItem({stationName, stationId, projectId}: TrainStationsListItemProps) {
 
     return (
         <li className="flex justify-between items-center">

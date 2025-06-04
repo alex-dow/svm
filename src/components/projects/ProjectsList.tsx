@@ -1,8 +1,8 @@
 import ProjectListItem from "./ProjectListItem";
-import { getProjects } from "@/lib/services/projects";
+import { handleGetProjects } from "@/lib/actions/projects";
+
 export default async function ProjectsList() {
-    
-    const projects = await getProjects();
+    const projects = await handleGetProjects();
     
     return (
         <>

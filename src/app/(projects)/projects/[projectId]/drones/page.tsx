@@ -3,6 +3,7 @@ export default async function DronesPage({params}: {params: Promise<{projectId: 
 
     return (
         <div className="p-2">
+            <p>Drones for project #{projectId}</p>
             <p>This feature is not implemented yet.</p>
         </div>
     )

@@ -3,6 +3,7 @@ export default async function TrucksPage({params}: {params: Promise<{projectId: 
 
     return (
         <div className="p-2">
+            <p>Trucks for project #{projectId}</p>
             <p>This feature is not implemented yet.</p>
         </div>
     )

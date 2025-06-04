@@ -1,18 +1,20 @@
 'use client';
-import { deleteProject } from "@/lib/services/projects";
 import ConfirmButton from "../buttons/ConfirmButton";
-import { useRouter } from "next/navigation";
+import { redirect, useRouter } from "next/navigation";
+import { authClient } from "@/lib/auth-client";
+import { handleDeleteProject } from "@/lib/actions/projects";
 
 export interface DeleteProjectButtonProps {
     projectId: number
 }
 
 export default function DeleteProjectButton(props: DeleteProjectButtonProps) {
-    
+    const session = authClient.useSession();
     const router = useRouter();
 
     const onDeleteProject = async () => {
-        await deleteProject(props.projectId);
+        if (!session.data) { redirect('/login')}
+        await handleDeleteProject(props.projectId);
         router.push('/');
     }
 

@@ -39,3 +39,9 @@ export interface SaveFileTrainStation {
     label: string,
     platforms: SaveFilePlatform[]
 }
+
+export interface SaveFileTrain {
+    id: string,
+    label: string,
+    wagons: string[]
+}

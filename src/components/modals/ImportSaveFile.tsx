@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
-import { SaveFileParserEvent, SaveFileParserEventType, SaveFilePlatform, SelectedItemsForImport } from "@/lib/types";
+import { SaveFileParserEvent, SaveFileParserEventType, SaveFilePlatform, SaveFileTrain, SaveFileTrainStation, SelectedItemsForImport } from "@/lib/types";
 import { Dialog } from "primereact/dialog";
 import { useEffect, useRef, useState } from "react";
 import Working from "./ImportSaveFile/Working";
@@ -8,11 +8,11 @@ import { Error } from "./ImportSaveFile/Error";
 import SelectSaveFile from "./ImportSaveFile/SelectSaveFile";
 import SelectImportableItems from "./ImportSaveFile/SelectImportableItems";
 import { createProject } from "@/lib/services/projects";
-import { createTrainStation, importStations } from "@/lib/services/stations";
-import { addStationPlatforms } from "@/lib/services/stationPlatforms";
-import { useRouter } from "next/navigation";
+import { importStations } from "@/lib/services/stations";
+import { redirect, useRouter } from "next/navigation";
 import { createTrainConsist } from "@/lib/services/trains";
 import { addTrainWagons } from "@/lib/services/trainWagons";
+import { authClient } from "@/lib/auth-client";
 
 export interface ImportSaveFileProps {
     visible: boolean,
@@ -26,13 +26,16 @@ export interface ImportSaveFileProps {
  */
 
 export default function ImportSaveFile({visible, onHide, header}: ImportSaveFileProps) {
+
+    const session = authClient.useSession();
+
     const workerRef = useRef<Worker>(null);
     const [file, setFile] = useState<File | null>(null);
     const [phase, setPhase] = useState<'new' | 'parsing' | 'parsing-finished' | 'importing' | 'importing-finished' | 'error'>('new');
 
     // save game data
-    const [ trainStations, setTrainStations ] = useState<{id: string, label: string, platforms: SaveFilePlatform[]}[]>([]);
-    const [ trains, setTrains ] = useState<{id: string, label: string, wagons: number }[]>([]);
+    const [ trainStations, setTrainStations ] = useState<SaveFileTrainStation[]>([]);
+    const [ trains, setTrains ] = useState<SaveFileTrain[]>([]);
 
     const [ saveName, setSaveName ] = useState('');
 
@@ -70,7 +73,7 @@ export default function ImportSaveFile({visible, onHide, header}: ImportSaveFile
                 setTrainStations(e.data.data as {id: string, label: string, platforms: SaveFilePlatform[]}[]);
             } else if (e.data.type === 'trains') {
                 console.log('worker message:', e);
-                setTrains(e.data.data as {id: string, label: string, wagons: number}[]);
+                setTrains(e.data.data as {id: string, label: string, wagons: []}[]);
             } else if (e.data.type === 'finished') {
                 setPhase('parsing-finished');
             } else if (e.data.type === 'error') {
@@ -100,11 +103,14 @@ export default function ImportSaveFile({visible, onHide, header}: ImportSaveFile
     }
 
     const onImportItems = async (items: SelectedItemsForImport) => {
+        if (!session.data) {
+            redirect('/login');
+        }
         setPhase('importing');
         setError(false);
 
         try {
-            const project = await createProject(saveName);
+            const project = await createProject(saveName, session.data.user.id);
             if (!project) {
                 console.error('failed to create project');
                 setError(true);

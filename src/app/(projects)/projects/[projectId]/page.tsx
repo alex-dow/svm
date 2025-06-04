@@ -1,5 +1,7 @@
-import { getProject } from "@/lib/services/projects";
-import { notFound } from "next/navigation";
+import { handleGetProject } from "@/lib/actions/projects";
+import { auth } from "@/lib/auth";
+import { headers } from "next/headers";
+import { notFound, redirect } from "next/navigation";
 
 export interface ProjectHomePageParams {
     projectId: string
@@ -10,8 +12,11 @@ export interface ProjectHomePageProps {
 }
 
 export default async function ProjectHomePage({params}: ProjectHomePageProps) {
+    const session = await auth.api.getSession({headers: await headers()});
+    if (!session) { redirect('/login') }
+
     const { projectId } = await params;
-    const project = await getProject(parseInt(projectId));
+    const project = await handleGetProject(parseInt(projectId));
     if (!project) {
         notFound();
     }
