@@ -1,13 +1,20 @@
 'use server';
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
-import { deleteTrainStation,  getCachedTrainStation,  getCachedTrainStations,  getTrainStation } from "../services/stations";
+import { createTrainStation, deleteTrainStation,  getCachedAllTrainStationItems,  getCachedTrainStation,  getCachedTrainStations,  getTrainStation } from "../services/stations";
 import { addStationPlatform, addStationPlatformItem, countStationPlatforms, getCachedTrainStationPlatforms, getStationPlatformItem, getStationPlatformItems, getTrainStationPlatform, removeStationPlatform, removeStationPlatformItem, repositionStationPlatform, setPlatformMode } from "../services/stationPlatforms";
 
 
 export async function handleGetTrainStations(projectId: number) {
     const user = await getCurrentUser();
     return getCachedTrainStations(projectId, user.id);
+}
+
+export async function handleCreateTrainStation(stationName: string, projectId: number) {
+    const user = await getCurrentUser();
+    const station = createTrainStation(stationName, projectId, user.id);
+    revalidateTag(`train-stations:${projectId}`);
+    return station;
 }
 
 export async function handleGetTrainStation(trainStationId: number) {
@@ -69,6 +76,7 @@ export async function handleSetPlatformMode(platformId: number, mode: 'loading' 
     await setPlatformMode(platformId, mode, user.id);
 
     revalidateTag(`train-station-platforms:${platform.train_station_id}`);
+    revalidateTag(`train-station-items:${platform.train_station_id}`);
 }
 
 export async function handleGetPlatformItems(platformId: number) {
@@ -85,13 +93,23 @@ export async function handleAddPlatformItem(platformId: number, itemId: string, 
 
     await addStationPlatformItem(platformId, itemId, rate, user.id);
     revalidateTag(`train-station-platform-items:${platformId}`)
+    revalidateTag(`train-station-items:${platform.train_station_id}`);
 }
 
 export async function handleRemovePlatformItem(platformId: number, itemId: number) {
     const user = await getCurrentUser();
     const item = await getStationPlatformItem(itemId, user.id);
     if (!item) throw new Error('Platform item not found');
+    
+    const platform = await getTrainStationPlatform(platformId, user.id);
+    
 
     await removeStationPlatformItem(itemId, user.id);
     revalidateTag(`train-station-platform-items:${platformId}`)
+    revalidateTag(`train-station-items:${platform?.train_station_id}`);
+}
+
+export async function handleGetStationItems(stationId: number) {
+    const user = await getCurrentUser();
+    return getCachedAllTrainStationItems(stationId, user.id);
 }

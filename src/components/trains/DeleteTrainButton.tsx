@@ -3,23 +3,22 @@
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import ButtonWithBusyModal from "../buttons/ButtonWithBusyModal";
+import { handleDeleteTrain } from "@/lib/actions/trains";
 
-import { handleDeleteTrainStation } from "@/lib/actions/trainStations";
-
-export interface DeleteStationButtonProps {
-    stationId: number,
+export interface DeleteTrainButtonProps {
+    trainId: number,
     projectId: number
 }
 
-export default function DeleteStationButton({stationId, projectId}: DeleteStationButtonProps) {
+export default function DeleteTrainButton({trainId, projectId}: DeleteTrainButtonProps) {
 
-    const params = useParams<{stationId?: string}>();
+    const params = useParams<{trainId?: string}>();
     const router = useRouter();
 
     const onDelete = async () => {
-        await handleDeleteTrainStation(stationId);
+        await handleDeleteTrain(trainId);
       
-        if (params.stationId && params.stationId === stationId.toString()) {
+        if (params.trainId && params.trainId === trainId.toString()) {
             router.push('/projects/' + projectId + '/trains');
         }
     }

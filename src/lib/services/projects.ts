@@ -125,7 +125,7 @@ export interface ImportProjectParameters {
     saveFileTrains: SaveFileTrain[]
 }
 
-export const importSaveFileProject = async ({projectName, ownerId, saveFileTrainStations}: ImportProjectParameters) => {
+export const importSaveFileProject = async ({projectName, ownerId, saveFileTrainStations, saveFileTrains}: ImportProjectParameters) => {
 
     const db = getDatabase();
 
@@ -167,6 +167,20 @@ export const importSaveFileProject = async ({projectName, ownerId, saveFileTrain
                 .insertInto('train_station_platform')
                 .values(platforms)
                 .returningAll()
+                .execute();
+        }
+
+        if (saveFileTrains.length > 0) {
+            await trx
+                .insertInto('train')
+                .values(saveFileTrains.map((t) => {
+                    return {
+                        name: t.label,
+                        owner_id: ownerId,
+                        project_id: project.id,
+                        wagons: t.wagons,
+                    }
+                }))
                 .execute();
         }
 

@@ -8,7 +8,8 @@ export interface ItemSelectProps {
     className?: string,
     id?: string,
     value?: string,
-    onChange?: (item: string) => void
+    onChange?: (item: string) => void,
+    itemFilter?: (item: IItemSchema) => boolean
 };
 
 export function ItemSelect(props: ItemSelectProps) {
@@ -22,7 +23,10 @@ export function ItemSelect(props: ItemSelectProps) {
     const refresh = async () => {
         setLoading(true);
         try {
-            const items = await getSatisfactoryItemsArray();
+            let items = await getSatisfactoryItemsArray();
+            if (props.itemFilter) {
+                items = items.filter(props.itemFilter);
+            }
             itemMap = await getSatisfactoryItems()
             if (items) {
                 setItems(items);

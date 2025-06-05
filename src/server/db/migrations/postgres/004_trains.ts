@@ -28,7 +28,29 @@ export async function up(db: Kysely<any>) {
         col.notNull()
         .references('train_station.id').onDelete('cascade')
     )
+    .addColumn('owner_id','text', (col) => 
+        col.notNull()
+        .references('user.id').onDelete('cascade')
+    )
     .addColumn('position', 'integer', (col) => col.notNull())
+    .execute();
+
+    await db.schema.createTable('train_timetable_stop_item')
+    .addColumn('id', 'serial', (col) => col.primaryKey())
+    .addColumn('stop_id', 'integer', (col) => 
+        col.notNull()
+        .references('train_timetable_stop.id').onDelete('cascade')
+    )
+    .addColumn('owner_id', 'text', (col) =>
+        col.notNull()
+        .references('user.id').onDelete('cascade')
+    )
+    .addColumn('item_id', 'text', (col) =>
+        col.notNull()
+    )
+    .addColumn('mode', 'text', (col) =>
+        col.notNull()
+    )
     .execute();
 }
 
@@ -36,4 +58,5 @@ export async function up(db: Kysely<any>) {
 export async function down(db: Kysely<any>) {
     await db.schema.dropTable("train").execute();
     await db.schema.dropTable('train_timetable_stop').execute();
+    await db.schema.dropTable('train_timetable_stop_item').execute();
 }

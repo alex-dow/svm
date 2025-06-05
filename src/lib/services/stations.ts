@@ -10,6 +10,7 @@ export async function getTrainStations(projectId: number, ownerId: string) {
     .select('name')
     .where('project_id', '=', projectId)
     .where('owner_id', '=', ownerId)
+    .orderBy('name', 'asc')
     .execute();
 }
 
@@ -21,18 +22,16 @@ export const getCachedTrainStations = (projectId: number, ownerId: string) => un
     }
 )(projectId, ownerId);
 
-export async function createTrainStation(stationName: string, projectId: number) {
-    const db = getDatabase();
-    const owner = await getCurrentUser();
-    if (!owner) { throw new Error('Unauthorized'); }
-
-    const station = await db.insertInto('train_station').values({
+export async function createTrainStation(stationName: string, projectId: number, ownerId: string) {
+    return getDatabase()
+    .insertInto('train_station')
+    .values({
         name: stationName,
         project_id: projectId,
-        owner_id: owner.id
-    }).returningAll().executeTakeFirst();
-
-    return station;
+        owner_id: ownerId
+    })
+    .returningAll()
+    .executeTakeFirst();
 }
 
 export async function createTrainStations(stationNames: string[], projectId: number) {
@@ -89,3 +88,24 @@ export const getCachedTrainStation = (stationId: number, ownerId: string) => uns
     }
 )(stationId, ownerId);
 
+export async function getAllTrainStationItems(stationId: number, ownerId: string) {
+    return getDatabase()
+    .selectFrom('train_station_platform_item')
+    .innerJoin('train_station_platform','train_station_platform_item.platform_id','train_station_platform.id')
+    .innerJoin('train_station','train_station_platform.train_station_id','train_station.id')
+    .select('item_id')
+    .select('train_station.id as station_id')
+    .select('train_station_platform.mode as mode')
+    .where('train_station.id','=',stationId)
+    .where('train_station_platform_item.owner_id', '=', ownerId)
+    .execute();
+
+}
+
+export const getCachedAllTrainStationItems = (stationId: number, ownerId: string) => unstable_cache(
+    async (stationId, ownerId) => getAllTrainStationItems(stationId, ownerId),
+    ['train-station-items'],
+    {
+        tags: [`train-station-items:${stationId}`]
+    }
+)(stationId, ownerId);

@@ -2,7 +2,9 @@
 
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
-import { createTrain, deleteTrain, getCachedTrain, getCachedTrains, getTrain, updateTrain } from "../services/trains";
+import { addTimetableStop, addTimetableStopItem, createTrain, deleteTrain, getCachedTimetableStopItems, getCachedTrain, getCachedTrains, getCachedTrainTimetable, getTimetableStopItem, getTrain, getTrainTimetable, getTrainTimetableStop, removeTimetableStop, removeTimetableStopItem, updateTrain } from "../services/trains";
+import { IItemSchema } from "../types/satisfactory/schema/IItemSchema";
+import { StationMode } from "../types";
 
 export async function handleGetTrain(trainId: number) {
     const user = await getCurrentUser();
@@ -38,9 +40,78 @@ export async function handleRenameTrain(trainId: number, name: string) {
     return newTrain;
 }
 
-export async function handleCreateTrain(projectId: number, name: string) {
+export async function handleCreateTrain(name: string, projectId: number) {
     const user = await getCurrentUser();
-    const train = await createTrain(projectId, name, user.id);
+    const train = await createTrain(name, projectId, user.id);
     revalidateTag(`trains:${projectId}`)
     return train;
+}
+
+export async function handleGetTimetable(trainId: number) {
+    const user = await getCurrentUser();
+    return getCachedTrainTimetable(trainId, user.id);
+}
+
+export async function handleRemoveStop(stopId: number) {
+    const user = await getCurrentUser();
+    const stop = await getTrainTimetableStop(stopId, user.id);
+    if (!stop) throw new Error('Timetable stop not found');
+    await removeTimetableStop(stopId, user.id);
+    revalidateTag(`train-timetable:${stop.consist_id}`)
+}
+
+
+export interface HandleAddStopParams {
+    trainId: number,
+    stationId: number,
+    loadingItems?: string[],
+    unloadingItems?: string[]
+}
+
+export async function handleAddStop({trainId, stationId, loadingItems, unloadingItems}: HandleAddStopParams) {
+    const user = await getCurrentUser();
+    
+    const stop = await addTimetableStop(trainId, stationId, user.id);
+    
+    if (!stop) throw new Error('Failed to create the timetable stop');
+
+    console.log('new stop:', stop.id);
+
+    if (loadingItems) {
+        await Promise.all(
+            loadingItems.map(
+                (item) => addTimetableStopItem(stop.id, item, 'loading', user.id)
+            )
+        );
+    }
+
+    if (unloadingItems) {
+        await Promise.all(
+            unloadingItems.map(
+                (item) => addTimetableStopItem(stop.id, item, 'unloading', user.id)
+            )
+        )
+    }
+
+    revalidateTag(`train-timetable:${trainId}`);
+}
+
+export async function handleGetStopItems(stopId: number) {
+    const user = await getCurrentUser();
+
+    return getCachedTimetableStopItems(stopId, user.id);
+}
+
+export async function handleRemoveStopItem(stopItemId: number) {
+    const user = await getCurrentUser();
+    const stop = await getTimetableStopItem(stopItemId, user.id);
+    if (!stop) throw new Error('Timetable stop item not found');
+    await removeTimetableStopItem(stopItemId, user.id);
+    revalidateTag(`timetable-stop-items:${stop.id}`);
+}
+
+export async function handleAddStopItem(stopId: number, itemId: string, mode: StationMode) {
+    const user = await getCurrentUser();
+    await addTimetableStopItem(stopId, itemId, mode, user.id);
+    revalidateTag(`timetable-stop-items:${stopId}`)
 }

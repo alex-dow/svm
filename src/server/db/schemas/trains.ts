@@ -17,9 +17,21 @@ export interface TrainTimetableStopTable {
     id: Generated<number>;
     consist_id: number;
     station_id: number;
-    owner_id: number;
+    owner_id: string;
     position: number;
 }
 export type TrainTimetableStop = Selectable<TrainTimetableStopTable>;
 export type CreateTrainTimetableStop = Insertable<TrainTimetableStopTable>;
 export type UpdateTrainTimestableStop = Updateable<TrainTimetableStopTable>;
+
+export interface TrainTimetableStopItemTable {
+    id: Generated<number>;
+    stop_id: number;
+    owner_id: string;
+    item_id: string;
+    mode: 'loading' | 'unloading'
+}
+
+export type TrainTimetableStopItem = Selectable<TrainTimetableStopItemTable>;
+export type CreateTrainTimetableStopItem = Insertable<TrainTimetableStopItemTable>;
+export type UpateTrainTimetableStopItem = Updateable<TrainTimetableStopItemTable>;

@@ -56,7 +56,7 @@ export async function handleExportProject(projectId: number) {
 export interface HandleImportSaveFileProjectParameters {
     projectName: string,
     saveFileTrainStations: SaveFileTrainStation[],
-    saveFileTrains: SaveFileTrain[]
+    saveFileTrains: SaveFileTrain[],
 }
 
 export async function handleImportSaveFileProject({projectName, saveFileTrainStations, saveFileTrains}: HandleImportSaveFileProjectParameters) {
