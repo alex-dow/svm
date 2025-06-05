@@ -125,7 +125,7 @@ export interface ImportProjectParameters {
     saveFileTrains: SaveFileTrain[]
 }
 
-export const importSaveFileProject = async ({projectName, ownerId, saveFileTrainStations, saveFileTrains}: ImportProjectParameters) => {
+export const importSaveFileProject = async ({projectName, ownerId, saveFileTrainStations}: ImportProjectParameters) => {
 
     const db = getDatabase();
 
