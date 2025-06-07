@@ -2,7 +2,6 @@
 import TrainStationSelect from "@/components/TrainStationSelect";
 import { Dialog } from "primereact/dialog";
 import { useCallback, useEffect, useState } from "react";
-import { AddItemButton } from "../platforms/buttons/AddItemButton";
 import { StationMode } from "@/lib/types";
 import { handleGetStationItems } from "@/lib/actions/trainStations";
 import { IItemSchema } from "@/lib/types/satisfactory/schema/IItemSchema";
@@ -135,7 +134,7 @@ export default function TimetableStopModal({visible, onHide, projectId, trainId}
                 <div className="flex gap-2">
                     <div className="w-1/2">
                         <h3 className="text-3xl font-bold">Loading</h3>
-                        <Button label="Add item" onClick={(e) => {
+                        <Button label="Add item" onClick={() => {
                             setSelectItemMode('loading');
                             setShowSelectItemModal(true);
                         }} />
@@ -147,7 +146,7 @@ export default function TimetableStopModal({visible, onHide, projectId, trainId}
                     </div>
                     <div className="w-1/2">
                         <h3 className="text-3xl font-bold">Unloading</h3>
-                        <Button label="Add item" onClick={(e) => {
+                        <Button label="Add item" onClick={() => {
                             setSelectItemMode('unloading');
                             setShowSelectItemModal(true);
                         }} />

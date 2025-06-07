@@ -109,6 +109,7 @@ export async function getTrainTimetableStop(stopId: number, ownerId: string) {
     .innerJoin('train_station','train_station.id','train_timetable_stop.station_id')
     .select('id')
     .select('station_id')
+    .select('consist_id')
     .select('train_station.name as station_name')
     .where('id','=',stopId)
     .where('owner_id','=',ownerId)
@@ -205,7 +206,4 @@ export async function removeTimetableStop(stopId: number, ownerId: string) {
     .execute();
 }
 
-export async function getAllStationItems(stationId: number, ownerId: string) {
-    return getDatabase()
-    .selectFrom('train_station_platform_item')
-}
+

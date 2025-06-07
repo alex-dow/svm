@@ -17,7 +17,7 @@ export default function ExportProject({visible, onHide, projectId}: ExportProjec
 
         const el = document.getElementById('project-export-download-link');
         el?.setAttribute('href', 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(project,null,4)));
-        el?.setAttribute('download','SVM - ' + project.project.name);
+        el?.setAttribute('download','SVM - ' + project.projectName);
         el?.click();
 
     }

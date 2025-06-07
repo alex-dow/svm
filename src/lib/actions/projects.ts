@@ -4,7 +4,7 @@ import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
 import { createProject, deleteProject, exportProject, getCachedProject, getCachedProjects, getProject, importSaveFileProject, updateProject } from "../services/projects";
 import { Project } from "@/server/db/schemas/projects";
-import { SaveFileTrain, SaveFileTrainStation } from "../types";
+import { ImportTrain, ImportTrainStation } from "../types/satisfactory/importSaveTypes";
 
 export async function handleGetProjects() {
     const user = await getCurrentUser();
@@ -55,8 +55,8 @@ export async function handleExportProject(projectId: number) {
 
 export interface HandleImportSaveFileProjectParameters {
     projectName: string,
-    saveFileTrainStations: SaveFileTrainStation[],
-    saveFileTrains: SaveFileTrain[],
+    saveFileTrainStations: ImportTrainStation[],
+    saveFileTrains: ImportTrain[],
 }
 
 export async function handleImportSaveFileProject({projectName, saveFileTrainStations, saveFileTrains}: HandleImportSaveFileProjectParameters) {

@@ -21,29 +21,3 @@ export interface SaveFileWorkerCommand<T> {
     data?: T
 }
 
-
-export interface SaveGameItem {
-    id: string,
-    label: string
-}
-
-export interface SaveFilePlatform {
-    id: string,
-    mode: boolean
-}
-export interface SaveFileTrainStation {
-    id: string,
-    label: string,
-    platforms: SaveFilePlatform[]
-}
-
-export interface SaveFileTrain {
-    id: string,
-    label: string,
-    wagons: number
-}
-
-export interface SelectedItemsForImport {
-    trainStations: SaveFileTrainStation[]
-    trains: SaveFileTrain[]
-}

@@ -1,6 +1,7 @@
-import { BoolProperty, ObjectProperty, Parser, SatisfactorySave, SaveComponent, SaveEntity, TextProperty } from "@etothepii/satisfactory-file-parser";
+import { BoolProperty, ObjectProperty, Parser, SatisfactorySave, SaveComponent, SaveEntity, StructArrayProperty, StructProperty, TextProperty } from "@etothepii/satisfactory-file-parser";
 import { getErrorMessage, sendEvent } from "./base";
-import { SaveFilePlatform } from "@/lib/types";
+import { TimeTableStop, TrainDockingRuleSet } from "@/lib/types/satisfactory/saveFileTypes";
+import { ImportTrain, ImportTrainStation, ImportTrainStationPlatform, ImportTrainTimetableStop } from "@/lib/types/satisfactory/importSaveTypes";
 
 /**
  * This worker will collect the following data:
@@ -65,8 +66,7 @@ const platformTypes = [
     ...modularStationPlatformTypes
 ];
 
-
-
+export type SaveItem = SaveEntity | SaveComponent;
 
 
 /**
@@ -96,6 +96,7 @@ export function collectImportableItems(save: SatisfactorySave) {
     // colleted wagons
     const wagons: (SaveEntity | SaveComponent)[] = [];
 
+    // collected timestables
     const timetables: (SaveEntity | SaveComponent)[] = [];
 
 
@@ -110,7 +111,6 @@ export function collectImportableItems(save: SatisfactorySave) {
             if (obj.typePath === stationTypeFilter) {
                 trainStations.push(obj);
             } else if (obj.typePath === platformConnectionType) {
-                console.log(obj.instanceName)
                 platformConnections.push(obj);
             } else if (obj.typePath === trainType) {
                 trainConsists.push(obj);
@@ -126,12 +126,11 @@ export function collectImportableItems(save: SatisfactorySave) {
         }
     }
 
-
     return { trainStations, platformConnections, trainConsists, locomotives, wagons, timetables, platforms };
 }
 
 
-export function getConsistWagons(carId: string, wagons: (SaveEntity | SaveComponent)[]) {
+export function getTrainWagons(carId: string, wagons: SaveItem[]) {
     const consistWagons = [];
 
     for (let i = 0; i < wagons.length; i++) {
@@ -139,7 +138,7 @@ export function getConsistWagons(carId: string, wagons: (SaveEntity | SaveCompon
         if (w.specialProperties.type === 'VehicleSpecialProperties') {
             if (w.specialProperties.vehicleInFront?.pathName === carId) {
                 if (w.specialProperties.vehicleBehind?.pathName) {
-                    consistWagons.push(...getConsistWagons(w.specialProperties.vehicleBehind.pathName, wagons));
+                    consistWagons.push(...getTrainWagons(w.specialProperties.vehicleBehind.pathName, wagons));
                 }
                 break;
             }
@@ -148,18 +147,63 @@ export function getConsistWagons(carId: string, wagons: (SaveEntity | SaveCompon
     return wagons;
 }
 
-export function buildConsist(train: SaveEntity | SaveComponent, wagons: (SaveEntity | SaveComponent)[]) {
+export function getTimetableStops(mStops: StructArrayProperty): ImportTrainTimetableStop[] {
+
+    return mStops.values.map((stop: StructProperty) => {
+        const timeTableStop = stop.value as unknown as TimeTableStop;
+        
+        const stationInstanceName = timeTableStop.properties.Station.value.pathName || 'unknown';
+
+        const dockingRulesSet = timeTableStop.properties.DockingRuleSet.value as unknown as TrainDockingRuleSet;
+
+        const loadingItems = dockingRulesSet.properties.LoadFilterDescriptors.values
+        .filter((desc) => desc.pathName != '/Game/FactoryGame/Resource/FilteringRules/Desc_None.Desc_None_C')
+        .map((desc) => {
+            return desc.pathName.split('.').pop() as string;
+        });
+
+        const unloadingItems = dockingRulesSet.properties.UnloadFilterDescriptors.values
+        .filter((desc) => desc.pathName != '/Game/FactoryGame/Resource/FilteringRules/Desc_None.Desc_None_C')
+        .map((desc) => {
+            return desc.pathName.split('.').pop() as string;
+        });
+
+        return {
+            loadingItems,
+            stationInstanceName,
+            unloadingItems
+        }
+
+    });
+}
+
+
+export function buildTrain(train: SaveItem, wagons: SaveItem[], timetables: SaveItem[]): ImportTrain {
     const mTrainName = train.properties['mTrainName'] as TextProperty;
     const firstVehicle = train.properties['FirstVehicle'] as ObjectProperty;
-    //const timeTable = train.properties['TimeTable'] as ObjectProperty;
+    const timeTable = train.properties['TimeTable'] as ObjectProperty;
 
-    const label = mTrainName.value.value;
-    const id = train.instanceName;
+    const trainName = mTrainName.value.value || 'unknown'
+    const instanceName = train.instanceName;
 
-    const consistWagons = getConsistWagons(firstVehicle.value.pathName, wagons);
+    const consistWagons = getTrainWagons(firstVehicle.value.pathName, wagons);
 
-    return { id, label, consistWagons };
+    let timeTableStops: ImportTrainTimetableStop[] = [];
+
+    const timeTableInstance = timetables.find((tt) => tt.instanceName === timeTable.value.pathName);
+    if (timeTableInstance) {
+        const stops = timeTableInstance.properties['mStops'] as StructArrayProperty;
+        timeTableStops = getTimetableStops(stops);
+    }
+
+    return {
+        instanceName,
+        timetable: timeTableStops,
+        trainName,
+        wagons: consistWagons.length,
+    }
 }
+
 
 
 
@@ -170,9 +214,9 @@ export function buildConsist(train: SaveEntity | SaveComponent, wagons: (SaveEnt
  * @param platforms 
  * @returns 
  */
-export function getStationPlatforms(connectionId: string, platformConnections: (SaveEntity | SaveComponent)[], platforms: (SaveEntity | SaveComponent)[]): SaveFilePlatform[] {
+export function getStationPlatforms(connectionId: string, platformConnections: SaveItem[], platforms: SaveItem[]): ImportTrainStationPlatform[] {
 
-    const stationPlatforms: SaveFilePlatform[] = [];
+    const stationPlatforms: ImportTrainStationPlatform[] = [];
 
     for (let i = 0; i < platformConnections.length; i++) {
         if (platformConnections[i].instanceName === connectionId) {
@@ -183,8 +227,8 @@ export function getStationPlatforms(connectionId: string, platformConnections: (
                 const platform = platforms.find((e) => e.instanceName === platformId);
                 const platformMode = platform?.properties['mIsInLoadMode'] ? (platform.properties['mIsInLoadMode'] as BoolProperty).value : true
                 stationPlatforms.push({
-                    id: pathName,
-                    mode: platformMode
+                    instanceName: pathName,
+                    mode: platformMode ? 'loading' : 'unloading'
                 });
                 break;
             }
@@ -194,12 +238,12 @@ export function getStationPlatforms(connectionId: string, platformConnections: (
     if (stationPlatforms.length > 0) {
         const connectedTo = stationPlatforms[stationPlatforms.length-1];
         let nextConnection: string;
-        if (connectedTo.id.endsWith('.PlatformConnection0')) {
-            nextConnection = connectedTo.id.replace('.PlatformConnection0','.PlatformConnection1');
-        } else if (connectedTo.id.endsWith('.PlatformConnection1')) {
-            nextConnection = connectedTo.id.replace('.PlatformConnection1','.PlatformConnection0');
+        if (connectedTo.instanceName.endsWith('.PlatformConnection0')) {
+            nextConnection = connectedTo.instanceName.replace('.PlatformConnection0','.PlatformConnection1');
+        } else if (connectedTo.instanceName.endsWith('.PlatformConnection1')) {
+            nextConnection = connectedTo.instanceName.replace('.PlatformConnection1','.PlatformConnection0');
         } else {
-            console.error('strange platform?', connectedTo);
+            console.warn('strange platform?', connectedTo);
             return stationPlatforms;
         }
         
@@ -217,17 +261,21 @@ export function getStationPlatforms(connectionId: string, platformConnections: (
  * @param platforms FGTrainPlatformConnection objects
  * @returns stationName, stationId, platforms: number
  */
-export function buildStation(station: SaveEntity | SaveComponent, platformConnections: (SaveEntity | SaveComponent)[], platforms: (SaveEntity | SaveComponent)[]) {
+export function buildStation(station: SaveItem, platformConnections: SaveItem[], platforms: SaveItem[]): ImportTrainStation {
     const mStation = station.properties['mStation'] as ObjectProperty;
     const mStationName = station.properties['mStationName'] as TextProperty;
 
-    const id = mStation.value.pathName;
-    const label = mStationName.value.value;
-    const connectionId = id + '.PlatformConnection0';
+    const stationInstanceName = mStation.value.pathName;
+    const connectionId = stationInstanceName + '.PlatformConnection0';
 
     const stationPlatforms = getStationPlatforms(connectionId, platformConnections, platforms);
 
-    return { id, label, platforms: stationPlatforms };
+    return {
+        instanceName: station.instanceName,
+        platforms: stationPlatforms,
+        stationName: mStationName.value.value || '', 
+        stationInstanceName 
+    };
 }
 
 export interface ParseSaveFileOptions {
@@ -264,7 +312,7 @@ export async function dispatcher(e: MessageEvent<File>) {
         const trainStations = collected.trainStations.map((trainStation) => buildStation(trainStation, collected.platformConnections, collected.platforms));
         sendEvent('train-stations', trainStations);
         
-        const trains = collected.trainConsists.map((trainConsist) => buildConsist(trainConsist, collected.wagons));
+        const trains = collected.trainConsists.map((trainConsist) => buildTrain(trainConsist, collected.wagons, collected.timetables));
         sendEvent('trains', trains);
         
         

@@ -1,3 +1,4 @@
+import { StationMode } from "@/lib/types";
 import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
 
@@ -29,7 +30,7 @@ export interface TrainTimetableStopItemTable {
     stop_id: number;
     owner_id: string;
     item_id: string;
-    mode: 'loading' | 'unloading'
+    mode: StationMode
 }
 
 export type TrainTimetableStopItem = Selectable<TrainTimetableStopItemTable>;

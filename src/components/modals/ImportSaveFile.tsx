@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 'use client';
-import { SaveFileParserEvent, SaveFileParserEventType, SaveFilePlatform, SaveFileTrain, SaveFileTrainStation, SelectedItemsForImport } from "@/lib/types";
+import { SaveFileParserEvent, SaveFileParserEventType } from "@/lib/types";
 import { Dialog } from "primereact/dialog";
 import { useEffect, useRef, useState } from "react";
 import Working from "./ImportSaveFile/Working";
@@ -10,6 +10,7 @@ import SelectImportableItems from "./ImportSaveFile/SelectImportableItems";
 import { redirect, useRouter } from "next/navigation";
 import { authClient } from "@/lib/auth-client";
 import { handleImportSaveFileProject } from "@/lib/actions/projects";
+import { ImportTrain, ImportTrainStation } from "@/lib/types/satisfactory/importSaveTypes";
 
 export interface ImportSaveFileProps {
     visible: boolean,
@@ -31,8 +32,8 @@ export default function ImportSaveFile({visible, onHide, header}: ImportSaveFile
     const [phase, setPhase] = useState<'new' | 'parsing' | 'parsing-finished' | 'importing' | 'importing-finished' | 'error'>('new');
 
     // save game data
-    const [ trainStations, setTrainStations ] = useState<SaveFileTrainStation[]>([]);
-    const [ trains, setTrains ] = useState<SaveFileTrain[]>([]);
+    const [ trainStations, setTrainStations ] = useState<ImportTrainStation[]>([]);
+    const [ trains, setTrains ] = useState<ImportTrain[]>([]);
 
     const [ saveName, setSaveName ] = useState('');
 
@@ -66,11 +67,9 @@ export default function ImportSaveFile({visible, onHide, header}: ImportSaveFile
             } else if (e.data.type === 'save-name') {
                 setSaveName(e.data.data as string);
             } else if (e.data.type === 'train-stations') {
-                console.log('worker message:', e);
-                setTrainStations(e.data.data as SaveFileTrainStation[]);
+                setTrainStations(e.data.data as ImportTrainStation[]);
             } else if (e.data.type === 'trains') {
-                console.log('worker message:', e);
-                setTrains(e.data.data as SaveFileTrain[]);
+                setTrains(e.data.data as ImportTrain[]);
             } else if (e.data.type === 'finished') {
                 setPhase('parsing-finished');
             } else if (e.data.type === 'error') {
@@ -99,7 +98,7 @@ export default function ImportSaveFile({visible, onHide, header}: ImportSaveFile
         workerRef.current.postMessage(file);
     }
 
-    const onImportItems = async (items: SelectedItemsForImport) => {
+    const onImportItems = async (items: {trainStations: ImportTrainStation[], trains: ImportTrain[]}) => {
         if (!session.data) {
             redirect('/login');
         }

@@ -1,4 +1,4 @@
-import { SaveFilePlatform, SelectedItemsForImport } from "@/lib/types";
+import { ImportTrain, ImportTrainStation } from "@/lib/types/satisfactory/importSaveTypes";
 import { Accordion, AccordionTab } from "primereact/accordion";
 import { Badge } from "primereact/badge";
 import { Button } from "primereact/button";
@@ -7,14 +7,14 @@ import { InputText } from "primereact/inputtext";
 import { useState } from "react";
 
 export interface SelectImportableItemsProps {
-    trainStations: {id: string, label: string, platforms: SaveFilePlatform[]}[],
-    trains: {id: string, label: string, wagons: number}[],
-    onImportItems: (e: SelectedItemsForImport) => void
+    trainStations: ImportTrainStation[],
+    trains: ImportTrain[],
+    onImportItems: (e: {trainStations: ImportTrainStation[], trains: ImportTrain[]}) => void
     saveName: string
 }
 
 export interface ItemsHeaderProps {
-    items: {id: string, label: string}[],
+    items: ImportTrain[] | ImportTrainStation[],
     header: React.ReactNode,
     setSelectedItems: (v: string[]) => void,
     selectedItems: string[]
@@ -28,7 +28,7 @@ export function ItemsHeader({items, header, setSelectedItems, selectedItems}: It
                 onClick={(e) => e.stopPropagation()}
                 checked={selectedItems.length === items.length} 
                 onChange={(e) => {
-                    setSelectedItems(e.checked ? items.map((item) => item.id) : []);
+                    setSelectedItems(e.checked ? items.map((item) => item.instanceName) : []);
                 }}
             />
             <div>
@@ -43,26 +43,26 @@ export function ItemsHeader({items, header, setSelectedItems, selectedItems}: It
 }
 
 export interface ItemsListProps {
-    items: {id: string, label: string}[],
+    items: {instanceName: string, label: string}[]
     setSelectedItems: (v: string[]) => void,
-    selectedItems: string[]
+    selectedItems: string[],
 }
 export function ItemsList({items, selectedItems, setSelectedItems}: ItemsListProps) {
 return (
     <ul>
         {items.map((item) => (
-            <li key={item.id} className="flex items-center gap-2 p-0.5">
+            <li key={item.instanceName} className="flex items-center gap-2 p-0.5">
                 <Checkbox 
-                checked={selectedItems.includes(item.id)} 
-                onChange={(e) => {
-                    if (e.checked) {
-                        setSelectedItems([...selectedItems, item.id]);
-                    } else {
-                        setSelectedItems(selectedItems.filter((id) => id === item.id));
-                    }
-                }}
+                    checked={selectedItems.includes(item.instanceName)} 
+                    onChange={(e) => {
+                        if (e.checked) {
+                            setSelectedItems([...selectedItems, item.instanceName]);
+                        } else {
+                            setSelectedItems(selectedItems.filter((id) => id === item.instanceName));
+                        }
+                    }}
                 /> 
-                {item.label}
+                {item.label }
             </li>
         ))}
     </ul>    
@@ -76,9 +76,9 @@ export default function SelectImportableItems({trainStations, trains, onImportIt
     const [ projectName, setProjectName ] = useState<string>(saveName);
 
     const onClick = () => {
-        const items: SelectedItemsForImport = {
-            trainStations: trainStations.filter((station) => selectedTrainStations.includes(station.id)),
-            trains: trains.filter((train) => selectedTrains.includes(train.id))
+        const items = {
+            trainStations: trainStations.filter((station) => selectedTrainStations.includes(station.instanceName)),
+            trains: trains.filter((train) => selectedTrains.includes(train.instanceName))
         }
 
         onImportItems(items);
@@ -102,7 +102,7 @@ export default function SelectImportableItems({trainStations, trains, onImportIt
                     />
                 )}>
                     <ItemsList 
-                        items={trainStations} 
+                        items={trainStations.map(ts => ({instanceName: ts.instanceName, label: ts.stationName}))} 
                         selectedItems={selectedTrainStations} 
                         setSelectedItems={setSelectedTrainStations} 
                     />
@@ -116,7 +116,7 @@ export default function SelectImportableItems({trainStations, trains, onImportIt
                     />
                 )}>
                     <ItemsList 
-                        items={trains} 
+                        items={trains.map(t => ({instanceName: t.instanceName, label: t.trainName}))} 
                         selectedItems={selectedTrains} 
                         setSelectedItems={setSelectedTrains} 
                     />
