@@ -21,6 +21,8 @@ export interface ConfirmButtonProps {
 
 export default function ConfirmButton(props: ConfirmButtonProps) {
     const onClick: MouseEventHandler = (e) => {
+        e.stopPropagation();
+        e.preventDefault();
         confirmPopup({
             target: e.currentTarget as HTMLElement,
             message: props.message,

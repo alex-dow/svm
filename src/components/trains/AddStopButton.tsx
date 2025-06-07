@@ -10,11 +10,17 @@ export default function AddStopButton({projectId, trainId}: {projectId: number, 
 
     return (
         <>
-        <Button label="Add stop" onClick={(e) => {
-            e.preventDefault();
-            setShowModal(true);
-        }}/>
-        <TimetableStopModal onHide={() => setShowModal(false)} visible={showModal} projectId={projectId} trainId={trainId}/>
+            <Button label="Add stop" onClick={(e) => {
+                e.preventDefault();
+                setShowModal(true);
+            }}/>
+            <TimetableStopModal onHide={
+                    () => setShowModal(false)
+                } 
+                visible={showModal} 
+                projectId={projectId} 
+                trainId={trainId}
+            />
         </>
     );
 }

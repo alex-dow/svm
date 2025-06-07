@@ -1,5 +1,8 @@
 import AddStopButton from "@/components/trains/AddStopButton";
+import DeleteStopButton from "@/components/trains/platforms/buttons/DeleteStopButton";
+import StopItems from "@/components/trains/timetable/StopItems";
 import { handleGetTimetable } from "@/lib/actions/trains";
+import { Accordion, AccordionTab } from "primereact/accordion";
 
 export default async function TrainPage({
   params,
@@ -16,11 +19,18 @@ export default async function TrainPage({
             <div className="flex flex-col w-1/2">
             <p>TIME TABLE</p>
             <AddStopButton projectId={projectId} trainId={trainId}/>
-            <ul>
+            <Accordion multiple>
                 {timetable.map((stop, idx) => (
-                    (<p key={stop.id}>#{idx+1} - {stop.station_name}</p>)
+                    <AccordionTab key={stop.id} header={
+                    <div className="flex justify-between w-full">
+                        <div>#{idx+1} - {stop.station_name}</div>
+                        <DeleteStopButton stopId={stop.id}/>
+                    </div>}>
+                        <StopItems projectId={projectId} trainId={trainId} stopId={stop.id}/>
+                    </AccordionTab>
                 ))}
-            </ul>
+            </Accordion>
+
             </div>
             <div className="flex w-1/2">
             <p>LOADING ITEMS</p>

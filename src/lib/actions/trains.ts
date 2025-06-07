@@ -103,10 +103,10 @@ export async function handleGetStopItems(stopId: number) {
 
 export async function handleRemoveStopItem(stopItemId: number) {
     const user = await getCurrentUser();
-    const stop = await getTimetableStopItem(stopItemId, user.id);
-    if (!stop) throw new Error('Timetable stop item not found');
+    const stopItem = await getTimetableStopItem(stopItemId, user.id);
+    if (!stopItem) throw new Error('Timetable stop item not found');
     await removeTimetableStopItem(stopItemId, user.id);
-    revalidateTag(`timetable-stop-items:${stop.id}`);
+    revalidateTag(`timetable-stop-items:${stopItem.stop_id}`);
 }
 
 export async function handleAddStopItem(stopId: number, itemId: string, mode: StationMode) {

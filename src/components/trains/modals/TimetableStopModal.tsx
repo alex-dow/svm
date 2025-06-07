@@ -32,7 +32,6 @@ export function TimetableStopItemSelectModal({stationId, mode, visible, onHide, 
     }
 
     const _onHide = () => {
-        setShowStationItems(false);
         setSelectedItem(undefined);
         onHide();
     }
@@ -105,24 +104,33 @@ export default function TimetableStopModal({visible, onHide, projectId, trainId}
     const [ unloadingItems, setUnloadingItems ] = useState<string[]>([]);
 
 
-    const onSubmit = (e: React.FormEvent) => {
+    const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
 
         if (!stationId) return;
 
-        handleAddStop({
+        await handleAddStop({
             stationId,
             trainId,
             loadingItems,
             unloadingItems
 
         })
+
+        _onHide();
+    }
+
+    const _onHide = () => {
+        setStationId(undefined);
+        setLoadingItems([]);
+        setUnloadingItems([]);
+        onHide();
     }
 
   
     return (
         <>
-        <Dialog visible={visible} header="Add a stop on this train's timetable" onHide={() => onHide()} >
+        <Dialog visible={visible} header="Add a stop on this train's timetable" onHide={() => _onHide()} >
             <div className="flex flex-col gap-4">
                 <TrainStationSelect 
                     projectId={projectId} 

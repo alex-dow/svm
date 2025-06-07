@@ -107,12 +107,12 @@ export async function getTrainTimetableStop(stopId: number, ownerId: string) {
     return getDatabase()
     .selectFrom('train_timetable_stop')
     .innerJoin('train_station','train_station.id','train_timetable_stop.station_id')
-    .select('id')
+    .select('train_timetable_stop.id as id')
     .select('station_id')
     .select('consist_id')
     .select('train_station.name as station_name')
-    .where('id','=',stopId)
-    .where('owner_id','=',ownerId)
+    .where('train_timetable_stop.id','=',stopId)
+    .where('train_timetable_stop.owner_id','=',ownerId)
     .executeTakeFirst();
 }
 
