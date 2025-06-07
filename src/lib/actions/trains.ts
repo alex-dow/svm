@@ -2,7 +2,7 @@
 
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
-import { addTimetableStop, addTimetableStopItem, createTrain, deleteTrain, getCachedTimetableStopItems, getCachedTrain, getCachedTrains, getCachedTrainTimetable, getTimetableStopItem, getTrain, getTrainTimetableStop, removeTimetableStop, removeTimetableStopItem, updateTrain } from "../services/trains";
+import { addTimetableStop, addTimetableStopItem, addTimetbleStopItems, createTrain, deleteTrain, getCachedTimetableStopItems, getCachedTrain, getCachedTrains, getCachedTrainTimetable, getTimetableStopItem, getTrain, getTrainTimetableStop, removeTimetableStop, removeTimetableStopItem, updateTrain } from "../services/trains";
 import { StationMode } from "../types";
 
 export async function handleGetTrain(trainId: number) {
@@ -112,5 +112,11 @@ export async function handleRemoveStopItem(stopItemId: number) {
 export async function handleAddStopItem(stopId: number, itemId: string, mode: StationMode) {
     const user = await getCurrentUser();
     await addTimetableStopItem(stopId, itemId, mode, user.id);
+    revalidateTag(`timetable-stop-items:${stopId}`)
+}
+
+export async function handleAddStopItems(stopId: number, items: {itemId: string, mode: StationMode}[]) {
+    const user = await getCurrentUser();
+    await addTimetbleStopItems(stopId, items, user.id);
     revalidateTag(`timetable-stop-items:${stopId}`)
 }

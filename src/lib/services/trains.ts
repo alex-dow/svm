@@ -164,6 +164,19 @@ export async function addTimetableStopItem(stopId: number, itemId: string, mode:
     .executeTakeFirst();
 }
 
+export async function addTimetbleStopItems(stopId: number, items: {itemId: string, mode: StationMode}[], ownerId: string) {
+    return getDatabase()
+    .insertInto('train_timetable_stop_item')
+    .values(items.map(item => ({
+        item_id: item.itemId,
+        stop_id: stopId,
+        owner_id: ownerId,
+        mode: item.mode
+    })))
+    .returningAll()
+    .execute();
+}
+
 export async function removeTimetableStopItem(stopItemId: number, ownerId: string) {
     return getDatabase()
     .deleteFrom('train_timetable_stop_item')

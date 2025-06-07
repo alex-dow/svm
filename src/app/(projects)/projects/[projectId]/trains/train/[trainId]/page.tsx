@@ -15,28 +15,28 @@ export default async function TrainPage({
     const timetable = await handleGetTimetable(trainId);
 
     return (
-        <div className="flex">
-            <div className="flex flex-col w-1/2">
-            <p>TIME TABLE</p>
-            <AddStopButton projectId={projectId} trainId={trainId}/>
-            <Accordion multiple>
-                {timetable.map((stop, idx) => (
-                    <AccordionTab key={stop.id} header={
-                    <div className="flex justify-between w-full">
-                        <div>#{idx+1} - {stop.station_name}</div>
-                        <DeleteStopButton stopId={stop.id}/>
-                    </div>}>
-                        <StopItems projectId={projectId} trainId={trainId} stopId={stop.id}/>
-                    </AccordionTab>
-                ))}
-            </Accordion>
+        <div className="flex flex-1">
+            <div className="flex flex-col flex-1">
+                <p>TIME TABLE</p>
+                <AddStopButton projectId={projectId} trainId={trainId} />
+                <Accordion multiple>
+                    {timetable.map((stop, idx) => (
+                        <AccordionTab key={stop.id} header={
+                            <div className="flex justify-between w-full flex-1 items-center">
+                                <div>#{idx+1} - {stop.station_name}</div>
+                                <DeleteStopButton stopId={stop.id}/>
+                            </div>
+                        } pt={{
+                            header: {
+                                className: 'items-center'
+                            }
+                        }}>
+                            <StopItems projectId={projectId} trainId={trainId} stopId={stop.id}/>
+                        </AccordionTab>
+                    ))}
+                </Accordion>
 
             </div>
-            <div className="flex w-1/2">
-            <p>LOADING ITEMS</p>
-            <p>UNLOADING ITEMS</p>
-            </div>
-
         </div>
     )
 }

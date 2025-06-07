@@ -16,7 +16,8 @@ export interface ConfirmButtonProps {
     className?: ButtonProps['className'],
     id?: string,
     rounded?: boolean,
-    outlined?: boolean
+    outlined?: boolean,
+    style?: ButtonProps['style']
 }
 
 export default function ConfirmButton(props: ConfirmButtonProps) {
@@ -45,6 +46,7 @@ export default function ConfirmButton(props: ConfirmButtonProps) {
             outlined={props.outlined}
             size={props.size}
             className={props.className}
+            style={props.style}
         />
         </>
 
