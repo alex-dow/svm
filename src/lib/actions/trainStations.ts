@@ -2,7 +2,7 @@
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
 import { createTrainStation, deleteTrainStation,  getCachedAllTrainStationItems,  getCachedTrainStation,  getCachedTrainStations,  getTrainStation } from "../services/stations";
-import { addStationPlatform, addStationPlatformItem, countStationPlatforms, getCachedTrainStationPlatforms, getStationPlatformItem, getStationPlatformItems, getTrainStationPlatform, removeStationPlatform, removeStationPlatformItem, repositionStationPlatform, setPlatformMode } from "../services/stationPlatforms";
+import { addStationPlatform, addStationPlatformItem, countStationPlatforms, getAllPlatformItems, getCachedTrainStationPlatforms, getStationPlatformItem, getStationPlatformItems, getTrainStationPlatform, removeStationPlatform, removeStationPlatformItem, repositionStationPlatform, setPlatformMode } from "../services/stationPlatforms";
 import { ItemType } from "../satisfactory/data";
 
 
@@ -30,6 +30,7 @@ export async function handleDeleteTrainStation(trainStationId: number) {
     await deleteTrainStation(trainStationId);
     revalidateTag(`train-stations:${station.project_id}`);
     revalidateTag(`train-timetable`);
+    
 }
 
 export async function handleGetStationPlatforms(trainStationId: number) {
@@ -42,6 +43,7 @@ export async function handleDeleteStationPlatform(platformId: number) {
     const platform = await getTrainStationPlatform(platformId, user.id);
     await removeStationPlatform(platformId, user.id);
     revalidateTag(`train-station-platforms:${platform?.train_station_id}`)
+    revalidateTag(`train-station-items:${platform?.train_station_id}`);
 }
 
 export async function handleMovePlatform(platformId: number, direction: 'up' | 'down') {
@@ -114,4 +116,9 @@ export async function handleRemovePlatformItem(platformId: number, itemId: numbe
 export async function handleGetStationItems(stationId: number) {
     const user = await getCurrentUser();
     return getCachedAllTrainStationItems(stationId, user.id);
+}
+
+export async function handleGetAllPlatformItems(projectId: number) {
+    const user = await getCurrentUser();
+    return getAllPlatformItems(projectId, user.id);
 }

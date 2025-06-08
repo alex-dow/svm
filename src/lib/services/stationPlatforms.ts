@@ -239,6 +239,22 @@ export const getCachedStationPlatformItems = (platformId: number, ownerId: strin
     }
 )(platformId, ownerId)
 
+
+
+export async function getAllPlatformItems(projectId: number, ownerId: string) {
+    return getDatabase()
+    .selectFrom('train_station')
+    .innerJoin('train_station_platform', 'train_station_platform.train_station_id', 'train_station.id')
+    .innerJoin('train_station_platform_item', 'train_station_platform_item.platform_id', 'train_station_platform.id')
+    .select('train_station_platform_item.item_id')
+    .select('train_station_platform_item.rate')
+    .select('train_station_platform.mode')
+    .select('train_station_platform.position')
+    .where('train_station.project_id','=',projectId)
+    .where('train_station.owner_id','=',ownerId)
+    .execute();
+}
+
 export const removeStationPlatformItem = async (itemId: number, ownerId: string) => {
     return getDatabase()
     .deleteFrom('train_station_platform_item')

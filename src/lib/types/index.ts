@@ -1,3 +1,5 @@
+import { ItemType } from "../satisfactory/data";
+
 export type StationMode = 'loading' | 'unloading';
 
 export type SaveFileParserEventType = 'parsing'| 'parsing-progress' | 'error' | 'loading' | 'collecting-items' | 'finished' | 'train-stations' | 'collected-items' | 'save-name' | 'trains';
@@ -21,3 +23,9 @@ export interface SaveFileWorkerCommand<T> {
     data?: T
 }
 
+export interface NetworkOverviewItem {
+    item_id: ItemType,
+    rate: number,
+    mode: StationMode,
+    position: number
+}

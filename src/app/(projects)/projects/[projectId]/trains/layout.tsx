@@ -7,6 +7,8 @@ import TrainsList from "@/components/trains/TrainsList";
 import AddTrainStationButton from "@/components/trains/AddTrainStationButton";
 import AddTrainButton from "@/components/trains/AddTrainButton";
 import { headers } from "next/headers";
+import { Button } from "primereact/button";
+import NetworkOverview from "@/components/trains/NetworkOverview";
 
 export default async function TrainsRootLayout({
   children,
@@ -24,26 +26,44 @@ export default async function TrainsRootLayout({
   const initialTab = isTrain ? 1 : 0;
 
   return (
-    <Splitter className="flex flex-1">
-      <SplitterPanel size={25} minSize={25} className="relative">
+    <div className="flex flex-1 gap-2">
+      <div className="relative w-1/4">
         <div className="absolute top-0 left-0 right-0 bottom-0 overflow-y-auto">
           <Suspense fallback={(<Loading/>)}>
-            <TabView activeIndex={initialTab}>
-              <TabPanel header="Stations">
+            <TabView activeIndex={initialTab} pt={{
+              panelContainer: {
+                className: 'p-1'
+              },
+              
+            }}>
+              <TabPanel header="Stations" pt={{
+                headerAction: {
+                  className: 'p-2'
+                }
+              }}>
                 <AddTrainStationButton projectId={projectId} />
                 <TrainStationsList projectId={projectId} />
               </TabPanel>
-              <TabPanel header="Trains">
+              <TabPanel header="Trains" pt={{
+                headerAction: {
+                  className: 'p-2'
+                }
+              }}>
                 <AddTrainButton projectId={projectId} />
                 <TrainsList projectId={projectId} />
               </TabPanel>
             </TabView>           
           </Suspense>
         </div>
-      </SplitterPanel>
-      <SplitterPanel size={75} className="flex flex-col">
+      </div>
+      <div className="flex flex-col w-1/2">
+
         { children }
-      </SplitterPanel>
-    </Splitter>
+      </div>
+      <div className="flex flex-col w-1/4">
+        <NetworkOverview projectId={projectId} />
+      </div>
+    </div>
   );
+
 }
