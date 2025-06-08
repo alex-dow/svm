@@ -1,5 +1,6 @@
 import AddStopButton from "@/components/trains/AddStopButton";
 import DeleteStopButton from "@/components/trains/platforms/buttons/DeleteStopButton";
+import StopAccordionTabHeader from "@/components/trains/timetable/StopAccordionTabHeader";
 import StopItems from "@/components/trains/timetable/StopItems";
 import { handleGetTimetable } from "@/lib/actions/trains";
 import { Accordion, AccordionTab } from "primereact/accordion";
@@ -20,13 +21,14 @@ export default async function TrainPage({
                 <p>TIME TABLE</p>
                 <AddStopButton projectId={projectId} trainId={trainId} />
                 <Accordion multiple>
-                    {timetable.map((stop, idx) => (
-                        <AccordionTab key={stop.id} header={
-                            <div className="flex justify-between w-full flex-1 items-center">
-                                <div>#{idx+1} - {stop.station_name}</div>
-                                <DeleteStopButton stopId={stop.id}/>
-                            </div>
-                        } pt={{
+                    {timetable.map((stop) => (
+                        <AccordionTab key={stop.id} header={<StopAccordionTabHeader
+                            stop={stop}
+                            totalStops={timetable.length}
+                            projectId={projectId}
+                        />}
+  
+                        pt={{
                             header: {
                                 className: 'items-center'
                             }

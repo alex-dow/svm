@@ -2,7 +2,7 @@
 
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
-import { addTimetableStop, addTimetableStopItem, addTimetbleStopItems, createTrain, deleteTrain, getCachedTimetableStopItems, getCachedTrain, getCachedTrains, getCachedTrainTimetable, getTimetableStopItem, getTrain, getTrainTimetableStop, removeTimetableStop, removeTimetableStopItem, updateTrain } from "../services/trains";
+import { addTimetableStop, addTimetableStopItem, addTimetbleStopItems, createTrain, deleteTrain, getCachedTimetableStopItems, getCachedTrain, getCachedTrains, getCachedTrainTimetable, getTimetableStopItem, getTrain, getTrainTimetableStop, removeTimetableStop, removeTimetableStopItem, repositionTimetableStop, updateTrain } from "../services/trains";
 import { StationMode } from "../types";
 import { ItemType } from "../satisfactory/data";
 
@@ -75,8 +75,6 @@ export async function handleAddStop({trainId, stationId, loadingItems, unloading
     
     if (!stop) throw new Error('Failed to create the timetable stop');
 
-    console.log('new stop:', stop.id);
-
     if (loadingItems) {
         await Promise.all(
             loadingItems.map(
@@ -120,4 +118,10 @@ export async function handleAddStopItems(stopId: number, items: {itemId: ItemTyp
     const user = await getCurrentUser();
     await addTimetbleStopItems(stopId, items, user.id);
     revalidateTag(`timetable-stop-items:${stopId}`)
+}
+
+export async function handleRepositionStop(trainId: number, stopId: number, newPosition: number) {
+    const user = await getCurrentUser();
+    await repositionTimetableStop(stopId, newPosition, user.id);
+    revalidateTag(`train-timetable:${trainId}`)
 }

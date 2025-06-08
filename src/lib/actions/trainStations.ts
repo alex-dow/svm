@@ -29,6 +29,7 @@ export async function handleDeleteTrainStation(trainStationId: number) {
     if (!station) throw new Error('Station not found');
     await deleteTrainStation(trainStationId);
     revalidateTag(`train-stations:${station.project_id}`);
+    revalidateTag(`train-timetable`);
 }
 
 export async function handleGetStationPlatforms(trainStationId: number) {

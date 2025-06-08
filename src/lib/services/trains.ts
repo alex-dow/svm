@@ -98,6 +98,8 @@ export async function getTrainTimetable(trainId: number, ownerId: string) {
     .select('train_timetable_stop.id as id')
     .select('train_timetable_stop.station_id as station_id')
     .select('train_station.name as station_name')
+    .select('train_timetable_stop.position as position')
+    .select('train_timetable_stop.consist_id as consist_id')
     .where('consist_id', '=', trainId)
     .where('train_timetable_stop.owner_id','=', ownerId)
     .orderBy('position','asc')
@@ -111,6 +113,7 @@ export async function getTrainTimetableStop(stopId: number, ownerId: string) {
     .select('train_timetable_stop.id as id')
     .select('station_id')
     .select('consist_id')
+    .select('position')
     .select('train_station.name as station_name')
     .where('train_timetable_stop.id','=',stopId)
     .where('train_timetable_stop.owner_id','=',ownerId)
@@ -121,7 +124,7 @@ export const getCachedTrainTimetable = (trainId: number, ownerId: string) => uns
     async (trainId, ownerId) => getTrainTimetable(trainId, ownerId),
     ['train-timetable'],
     {
-        tags: [`train-timetable:${trainId}`]
+        tags: [`train-timetable`,`train-timetable:${trainId}`]
     }
 )(trainId, ownerId);
 
@@ -138,7 +141,7 @@ export async function getLastTimetableStop(trainId: number, ownerId: string) {
 
 export async function addTimetableStop(trainId: number, stationId: number, ownerId: string) {
     const lastStop = await getLastTimetableStop(trainId, ownerId);
-    const position = (lastStop) ? lastStop.position : 1;
+    const position = (lastStop) ? lastStop.position + 1 : 1;
 
     return getDatabase()
     .insertInto('train_timetable_stop')
@@ -150,6 +153,41 @@ export async function addTimetableStop(trainId: number, stationId: number, owner
     })
     .returningAll()
     .executeTakeFirst();
+}
+
+export async function repositionTimetableStop(stopId: number, newPosition: number, ownerId: string) {
+
+    const db = getDatabase();
+    const stop = await db
+    .selectFrom('train_timetable_stop')
+    .select(['position','consist_id'])
+    .where('id','=',stopId)
+    .executeTakeFirstOrThrow();
+
+    if (newPosition < stop.position) {
+        await db.updateTable('train_timetable_stop')
+        .set((eb) => ({
+            position: eb('position','+',1)
+        }))
+        .where('position','<',stop.position)
+        .where('position','>=',newPosition)
+        .where('consist_id','=',stop.consist_id)
+        .execute();
+    } else if (newPosition > stop.position) {
+        await db.updateTable('train_timetable_stop')
+        .set((eb) => ({
+            position: eb('position','-',1)
+        }))
+        .where('position','>',stop.position)
+        .where('position','<=',newPosition)
+        .where('consist_id','=',stop.consist_id)
+        .execute();
+    }
+
+    await db.updateTable('train_timetable_stop')
+    .set({
+        position: newPosition
+    }).where('id','=',stopId).execute();
 }
 
 export async function addTimetableStopItem(stopId: number, itemId: ItemType, mode: StationMode, ownerId: string) {
@@ -213,11 +251,32 @@ export const getCachedTimetableStopItems = (stopId: number, ownerId: string) => 
 )(stopId, ownerId);
 
 export async function removeTimetableStop(stopId: number, ownerId: string) {
-    return getDatabase()
+
+    const db = getDatabase();
+
+    const stop = await db
+        .selectFrom('train_timetable_stop')
+        .select(['position','consist_id'])
+        .where('id','=',stopId)
+        .executeTakeFirstOrThrow();
+
+    await getDatabase()
     .deleteFrom('train_timetable_stop')
     .where('id','=',stopId)
     .where('owner_id','=',ownerId)
     .execute();
+
+    await db
+    .updateTable('train_timetable_stop')
+    .set((eb) => ({
+        position: eb('position','-',1)
+    }))
+    .where('owner_id','=',ownerId)
+    .where('consist_id','=',stop.consist_id)
+    .where('position', '>', stop.position)
+    .execute();
+
+
 }
 
 

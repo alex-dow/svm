@@ -15,11 +15,7 @@ export default function DeleteStopButton({stopId}: {stopId: number}) {
             outlined
             severity="danger"
             size="small"
-            style={{
-                height: '1rem', width: '1rem'
-            }}
-            
-            rounded
+            className="p-1 pt-1.5 w-8"
             accept={onAccept}
         />
     )

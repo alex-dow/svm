@@ -15,6 +15,11 @@ export function DeletePlatformButton({platformId}: DeletePlatformButtonProps) {
   }
 
   return (
-    <ButtonWithBusyModal severity="danger" icon="pi pi-trash" progressMessage="Deleting ..." onClick={onClick} />
+    <ButtonWithBusyModal 
+      severity="danger" 
+      icon="pi pi-trash" 
+      progressMessage="Deleting ..." 
+      onClick={onClick} 
+    />
   );
 }

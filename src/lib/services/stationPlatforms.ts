@@ -88,16 +88,12 @@ export async function addStationPlatform(stationId: number, ownerId: string) {
 
 export async function repositionStationPlatform(platformId: number, newPosition: number) {
 
-
-    console.log('repositionStationPlatform', platformId, newPosition);
     const db = getDatabase();
     const owner = await getCurrentUser();
     if (!owner) { throw new Error('Unauthorized'); }
 
     const platform = await db
         .selectFrom('train_station_platform')
-        .leftJoin('train_station', 'train_station.id', 'train_station_platform.train_station_id')
-        .select('train_station.project_id')
         .select('train_station_platform.position')
         .select('train_station_platform.owner_id')
         .select('train_station_platform.train_station_id')
@@ -114,7 +110,7 @@ export async function repositionStationPlatform(platformId: number, newPosition:
     }
 
     if (newPosition < platform.position) {
-        db.updateTable('train_station_platform')
+        await db.updateTable('train_station_platform')
         .set((eb) => ({
             position: eb('position','+',1)
         }))
@@ -123,7 +119,7 @@ export async function repositionStationPlatform(platformId: number, newPosition:
         .where('train_station_id','=',platform.train_station_id)
         .execute();
     } else if (newPosition > platform.position) {
-        db.updateTable('train_station_platform')
+        await db.updateTable('train_station_platform')
         .set((eb) => ({
             position: eb('position', '-', 1)
         }))
@@ -133,7 +129,7 @@ export async function repositionStationPlatform(platformId: number, newPosition:
         .execute();
     }
 
-    db.updateTable('train_station_platform')
+    await db.updateTable('train_station_platform')
     .set({
         position: newPosition
     })
