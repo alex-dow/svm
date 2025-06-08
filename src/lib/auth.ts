@@ -20,7 +20,7 @@ const options: BetterAuthOptions = {
     database: {
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         db: getDatabase() as any, // Single type assertion to avoid compatibility issues
-        type: 'sqlite'
+        type: 'postgres'
     },
     
 }

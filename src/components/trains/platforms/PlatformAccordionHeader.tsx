@@ -5,6 +5,7 @@ import { DeletePlatformButton } from "./buttons/DeletePlatformButton";
 import { handleGetPlatformItems } from "@/lib/actions/trainStations";
 import { items } from "@/lib/satisfactory/data";
 import Image from "next/image";
+import { Badge } from "primereact/badge";
 
 export default async function PlatformAccordionHeader({
   platform,
@@ -22,18 +23,34 @@ export default async function PlatformAccordionHeader({
     <div className="flex flex-1 items-center gap-4">
       <div>
         <div className="flex gap-1 items-center">
-          <div className="text-xs text-gray-400">#{platform.id}</div>
+          
           <h1>Platform #{platform.position}</h1>
         </div>
-
-        <span className="text-sm text-gray-400">Mode: { platform.mode === 'loading' ? 'Loading' : 'Unloading'}</span>
+        <div className="flex flex-col">
+          <div className="text-xs text-gray-400">ID: #{platform.id}</div>
+          <div className="text-xs text-gray-400">Mode: { platform.mode === 'loading' ? 'Loading' : 'Unloading'}</div>
+        </div>
       </div>
-      <div className="flex gap-1 flex-1">
+      <div className="flex gap-1 flex-1 w-1/3">
           {platformItems.map((item) => {
             const itemData = items[item.item_id];
-
-
-            return (<Image src={"/data/items/" + itemData.icon + "_64.png"} key={item.item_id} alt={itemData.name} width={32} height={32}/>)
+            return (
+              <div className="p-overlay-badge" key={item.item_id}>
+                <Image 
+                  src={"/data/items/" + itemData.icon + "_64.png"} 
+                  key={item.item_id} 
+                  alt={itemData.name} 
+                  width={32} 
+                  height={32}
+                  title={platform.mode.charAt(0).toUpperCase() + platform.mode.slice(1) + " " + itemData.name}
+                />
+                <Badge 
+                  severity={platform.mode === 'loading' ? 'success' : 'danger'} 
+                  value={item.rate} 
+                  style={{'fontSize': '10px', 'lineHeight': '0.5rem', 'height': '1rem'}} 
+                  className="p-1" />
+              </div>
+            )
           })}
 
       </div>      
