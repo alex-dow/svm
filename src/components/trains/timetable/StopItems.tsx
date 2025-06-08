@@ -2,6 +2,7 @@ import { handleGetStopItems } from "@/lib/actions/trains";
 import { TrainTimetableStopItem } from "@/server/db/schemas/trains";
 import { DeleteStopItemButton } from "../platforms/buttons/DeleteStopItemButton";
 import AddStopItemButton from "../AddStopItemButton";
+import { items } from "@/lib/satisfactory/data";
 
 export interface StopItemsProps {
     projectId: number;
@@ -9,11 +10,11 @@ export interface StopItemsProps {
     stopId: number;
 }
 
-export function StopItem({item}: {item: TrainTimetableStopItem}) {
+export function StopItem({itemId, itemLabel}: {itemId: number, itemLabel: string}) {
     return (
-        <li key={item.id} className="flex justify-between">
-            <div>{item.item_id}</div>
-            <DeleteStopItemButton stopItemId={item.id}/>
+        <li key={itemId} className="flex justify-between">
+            <div>{itemLabel}</div>
+            <DeleteStopItemButton stopItemId={itemId}/>
         </li>
     )
 }
@@ -41,7 +42,7 @@ export default async function StopItems({stopId}: StopItemsProps) {
                     
                 </div>
                 <ul>
-                    {loadingItems.map((item) => (<StopItem key={item.id} item={item}/>))}
+                    {loadingItems.map((item) => (<StopItem key={item.id} itemId={item.id} itemLabel={items[item.item_id].name || item.item_id}/>))}
                 </ul>
             </div>
             <div className="w-1/2">
@@ -51,7 +52,7 @@ export default async function StopItems({stopId}: StopItemsProps) {
                     
                 </div>
                 <ul>
-                    {unloadingItems.map((item) => (<StopItem key={item.id} item={item}/>))}
+                    {unloadingItems.map((item) => (<StopItem key={item.id} itemId={item.id} itemLabel={items[item.item_id].name || item.item_id}/>))}
                 </ul>
             </div>
         </div>

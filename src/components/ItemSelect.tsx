@@ -1,8 +1,7 @@
 'use client';
-import { getSatisfactoryItems, getSatisfactoryItemsArray } from "@/lib/satisfactory/data";
 import { IItemSchema } from "@/lib/types/satisfactory/schema/IItemSchema";
 import { Dropdown } from "primereact/dropdown";
-import { useEffect, useState } from "react";
+import { items } from "@/lib/satisfactory/data";
 
 export interface ItemSelectProps {
     className?: string,
@@ -14,33 +13,13 @@ export interface ItemSelectProps {
 
 export function ItemSelect(props: ItemSelectProps) {
 
-    const [loading, setLoading] = useState(true);
-    const [items, setItems] = useState<IItemSchema[]>([]);
+    let availableItems: IItemSchema[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let itemMap: Record<string, IItemSchema> = {};
-
-    const refresh = async () => {
-        setLoading(true);
-        try {
-            let items = await getSatisfactoryItemsArray();
-            if (props.itemFilter) {
-                items = items.filter(props.itemFilter);
-            }
-            itemMap = await getSatisfactoryItems()
-            if (items) {
-                setItems(items);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-        setLoading(false);
+    if (props.itemFilter) {
+        availableItems = Object.values(items).filter(props.itemFilter);
+    } else {
+        availableItems = Object.values(items);
     }
-
-    useEffect(() => {
-        refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[])
 
     return (
         <Dropdown 
@@ -50,10 +29,9 @@ export function ItemSelect(props: ItemSelectProps) {
                     props.onChange(e.value)
                 }
             }}
-            options={items}
+            options={availableItems}
             optionLabel="name"
             optionValue="className"
-            loading={loading}
             filter
         />
     )

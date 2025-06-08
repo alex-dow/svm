@@ -4,6 +4,7 @@ import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
 import { addTimetableStop, addTimetableStopItem, addTimetbleStopItems, createTrain, deleteTrain, getCachedTimetableStopItems, getCachedTrain, getCachedTrains, getCachedTrainTimetable, getTimetableStopItem, getTrain, getTrainTimetableStop, removeTimetableStop, removeTimetableStopItem, updateTrain } from "../services/trains";
 import { StationMode } from "../types";
+import { ItemType } from "../satisfactory/data";
 
 export async function handleGetTrain(trainId: number) {
     const user = await getCurrentUser();
@@ -63,8 +64,8 @@ export async function handleRemoveStop(stopId: number) {
 export interface HandleAddStopParams {
     trainId: number,
     stationId: number,
-    loadingItems?: string[],
-    unloadingItems?: string[]
+    loadingItems?: ItemType[],
+    unloadingItems?: ItemType[]
 }
 
 export async function handleAddStop({trainId, stationId, loadingItems, unloadingItems}: HandleAddStopParams) {
@@ -109,13 +110,13 @@ export async function handleRemoveStopItem(stopItemId: number) {
     revalidateTag(`timetable-stop-items:${stopItem.stop_id}`);
 }
 
-export async function handleAddStopItem(stopId: number, itemId: string, mode: StationMode) {
+export async function handleAddStopItem(stopId: number, itemId: ItemType, mode: StationMode) {
     const user = await getCurrentUser();
     await addTimetableStopItem(stopId, itemId, mode, user.id);
     revalidateTag(`timetable-stop-items:${stopId}`)
 }
 
-export async function handleAddStopItems(stopId: number, items: {itemId: string, mode: StationMode}[]) {
+export async function handleAddStopItems(stopId: number, items: {itemId: ItemType, mode: StationMode}[]) {
     const user = await getCurrentUser();
     await addTimetbleStopItems(stopId, items, user.id);
     revalidateTag(`timetable-stop-items:${stopId}`)

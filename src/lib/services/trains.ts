@@ -3,6 +3,7 @@ import { getCurrentUser } from "./auth";
 import { Train } from "@/server/db/schemas/trains";
 import { unstable_cache } from "next/cache";
 import { StationMode } from "../types";
+import { ItemType } from "../satisfactory/data";
 
 export async function getTrains(projectId: number, ownerId: string) {
     return getDatabase()
@@ -151,7 +152,7 @@ export async function addTimetableStop(trainId: number, stationId: number, owner
     .executeTakeFirst();
 }
 
-export async function addTimetableStopItem(stopId: number, itemId: string, mode: StationMode, ownerId: string) {
+export async function addTimetableStopItem(stopId: number, itemId: ItemType, mode: StationMode, ownerId: string) {
     return getDatabase()
     .insertInto('train_timetable_stop_item')
     .values({
@@ -164,7 +165,7 @@ export async function addTimetableStopItem(stopId: number, itemId: string, mode:
     .executeTakeFirst();
 }
 
-export async function addTimetbleStopItems(stopId: number, items: {itemId: string, mode: StationMode}[], ownerId: string) {
+export async function addTimetbleStopItems(stopId: number, items: {itemId: ItemType, mode: StationMode}[], ownerId: string) {
     return getDatabase()
     .insertInto('train_timetable_stop_item')
     .values(items.map(item => ({

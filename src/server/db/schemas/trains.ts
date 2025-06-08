@@ -1,3 +1,4 @@
+import { ItemType } from "@/lib/satisfactory/data";
 import { StationMode } from "@/lib/types";
 import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
@@ -29,7 +30,7 @@ export interface TrainTimetableStopItemTable {
     id: Generated<number>;
     stop_id: number;
     owner_id: string;
-    item_id: string;
+    item_id: ItemType;
     mode: StationMode
 }
 

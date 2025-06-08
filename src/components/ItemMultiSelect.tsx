@@ -1,46 +1,25 @@
 'use client';
-import { getSatisfactoryItems, getSatisfactoryItemsArray } from "@/lib/satisfactory/data";
 import { IItemSchema } from "@/lib/types/satisfactory/schema/IItemSchema";
 import { MultiSelect } from "primereact/multiselect";
-import { useEffect, useState } from "react";
+import { items, ItemType } from "@/lib/satisfactory/data";
 
 export interface ItemSelectProps {
     className?: string,
     id?: string,
-    value?: string[],
-    onChange?: (items: string[]) => void,
+    value: ItemType[],
+    onChange?: (items: ItemType[]) => void,
     itemFilter?: (item: IItemSchema) => boolean
 };
 
 export function ItemMultiSelect(props: ItemSelectProps) {
 
-    const [loading, setLoading] = useState(true);
-    const [items, setItems] = useState<IItemSchema[]>([]);
+    let availableItems: IItemSchema[] = [];
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    let itemMap: Record<string, IItemSchema> = {};
-
-    const refresh = async () => {
-        setLoading(true);
-        try {
-            let items = await getSatisfactoryItemsArray();
-            if (props.itemFilter) {
-                items = items.filter(props.itemFilter);
-            }
-            itemMap = await getSatisfactoryItems()
-            if (items) {
-                setItems(items);
-            }
-        } catch (err) {
-            console.error(err);
-        }
-        setLoading(false);
+    if (props.itemFilter) {
+        availableItems = Object.values(items).filter(props.itemFilter);
+    } else {
+        availableItems = Object.values(items);
     }
-
-    useEffect(() => {
-        refresh();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    },[])
 
     return (
         <MultiSelect 
@@ -50,11 +29,10 @@ export function ItemMultiSelect(props: ItemSelectProps) {
                     props.onChange(e.value)
                 }
             }}
-            options={items}
+            options={availableItems}
             optionLabel="name"
             optionValue="className"
             display="chip"
-            loading={loading}
             maxSelectedLabels={4}
             virtualScrollerOptions={{ itemSize: 43 }}
             filter

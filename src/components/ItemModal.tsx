@@ -5,7 +5,7 @@ import { InputNumber } from "primereact/inputnumber"
 import { IItemSchema } from "@/lib/types/satisfactory/schema/IItemSchema";
 import { useEffect, useState } from "react";
 import { Button } from "primereact/button";
-import { getSatisfactoryItems } from "@/lib/satisfactory/data";
+import { items, ItemType } from "@/lib/satisfactory/data";
 
 export interface ItemModalOnSaveArgs {
     item: IItemSchema, 
@@ -36,10 +36,9 @@ export default function ItemModal(props: ItemModalProps) {
 
     const onSave = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const items = await getSatisfactoryItems();
         if (props.onSave && selectedItemClassName) {
             props.onSave({
-                item: items[selectedItemClassName],
+                item: items[selectedItemClassName as ItemType],
                 rate: rate || 0
             });
         }

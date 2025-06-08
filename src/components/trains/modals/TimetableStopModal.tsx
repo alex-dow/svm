@@ -1,16 +1,15 @@
 'use client';
 import TrainStationSelect from "@/components/TrainStationSelect";
 import { Dialog } from "primereact/dialog";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { StationMode } from "@/lib/types";
 import { handleGetStationItems } from "@/lib/actions/trainStations";
 import { IItemSchema } from "@/lib/types/satisfactory/schema/IItemSchema";
 import { ItemSelect } from "@/components/ItemSelect";
 import { Checkbox } from "primereact/checkbox";
 import { Button } from "primereact/button";
-import { getSatisfactoryItems } from "@/lib/satisfactory/data";
 import { handleAddStop } from "@/lib/actions/trains";
-
+import { items, ItemType } from "@/lib/satisfactory/data";
 
 export interface TimetableStopItemSelectModalProps {
     visible: boolean,
@@ -24,7 +23,7 @@ export function TimetableStopItemSelectModal({stationId, mode, visible, onHide, 
 
     const [ stationItems, setStationItems ] = useState<{item_id: string, station_id: number, mode: StationMode}[]>([]);
     const [ showStationItems, setShowStationItems ] = useState(false);
-    const [ selectedItem, setSelectedItem ] = useState<string>();
+    const [ selectedItem, setSelectedItem ] = useState<string>('');
     
 
     const itemFilter = (item: IItemSchema) => {
@@ -32,22 +31,16 @@ export function TimetableStopItemSelectModal({stationId, mode, visible, onHide, 
     }
 
     const _onHide = () => {
-        setSelectedItem(undefined);
+        setSelectedItem('');
         onHide();
     }
 
-    const refresh = useCallback(() => {
-
+    useEffect(() => {
         handleGetStationItems(stationId)
         .then((res) => {
-            console.log('res?', res);
             setStationItems(res.filter((i) => i.mode === mode));
         });
-    }, [stationId, mode])
-
-    useEffect(() => {
-        refresh();
-    },[stationId, mode, refresh]);
+    },[stationId, mode]);
 
     const onSubmit = (e: React.FormEvent) => {
         e.preventDefault();
@@ -94,14 +87,11 @@ export default function TimetableStopModal({visible, onHide, projectId, trainId}
 
     const [ stationId, setStationId] = useState<number>();
 
-    const [ itemMap, setItemMap ] = useState<{[key: string]: IItemSchema}>({});
-    getSatisfactoryItems().then(setItemMap);
-
     const [ selectItemMode, setSelectItemMode ] = useState<StationMode>('loading');
     const [ showSelectItemModal, setShowSelectItemModal ] = useState(false);
 
-    const [ loadingItems, setLoadingItems ] = useState<string[]>([]);
-    const [ unloadingItems, setUnloadingItems ] = useState<string[]>([]);
+    const [ loadingItems, setLoadingItems ] = useState<ItemType[]>([]);
+    const [ unloadingItems, setUnloadingItems ] = useState<ItemType[]>([]);
 
 
     const onSubmit = async (e: React.FormEvent) => {
@@ -148,7 +138,7 @@ export default function TimetableStopModal({visible, onHide, projectId, trainId}
                         }} />
                         { loadingItems.map((loadingItem) => (
                             <div key={loadingItem}>
-                                { itemMap[loadingItem].name }
+                                { items[loadingItem].name }
                             </div>
                         ))}
                     </div>
@@ -160,7 +150,7 @@ export default function TimetableStopModal({visible, onHide, projectId, trainId}
                         }} />
                         { unloadingItems.map((loadingItem) => (
                             <div key={loadingItem}>
-                                { itemMap[loadingItem].name }
+                                { items[loadingItem].name }
                             </div>
                         ))}                        
                     </div>
@@ -175,9 +165,9 @@ export default function TimetableStopModal({visible, onHide, projectId, trainId}
                     onSelectItem={(itemId) => {
                         if (itemId) {
                         if (selectItemMode === 'loading') {
-                            setLoadingItems([...loadingItems, itemId]);
+                            setLoadingItems([...loadingItems, itemId as ItemType]);
                         } else {
-                            setUnloadingItems([...unloadingItems, itemId]);
+                            setUnloadingItems([...unloadingItems, itemId as ItemType]);
                         }
                     }}}
                 />
