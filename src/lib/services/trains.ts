@@ -162,6 +162,7 @@ export async function repositionTimetableStop(stopId: number, newPosition: numbe
     .selectFrom('train_timetable_stop')
     .select(['position','consist_id'])
     .where('id','=',stopId)
+    .where('owner_id','=',ownerId)
     .executeTakeFirstOrThrow();
 
     if (newPosition < stop.position) {
@@ -172,6 +173,7 @@ export async function repositionTimetableStop(stopId: number, newPosition: numbe
         .where('position','<',stop.position)
         .where('position','>=',newPosition)
         .where('consist_id','=',stop.consist_id)
+        .where('owner_id','=',ownerId)
         .execute();
     } else if (newPosition > stop.position) {
         await db.updateTable('train_timetable_stop')
@@ -181,13 +183,17 @@ export async function repositionTimetableStop(stopId: number, newPosition: numbe
         .where('position','>',stop.position)
         .where('position','<=',newPosition)
         .where('consist_id','=',stop.consist_id)
+        .where('owner_id','=',ownerId)
         .execute();
     }
 
     await db.updateTable('train_timetable_stop')
     .set({
         position: newPosition
-    }).where('id','=',stopId).execute();
+    })
+    .where('id','=',stopId)
+    .where('owner_id','=',ownerId)
+    .execute();
 }
 
 export async function addTimetableStopItem(stopId: number, itemId: ItemType, mode: StationMode, ownerId: string) {
