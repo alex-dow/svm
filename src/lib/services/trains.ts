@@ -2,7 +2,7 @@ import { getDatabase } from "@/server/db";
 import { getCurrentUser } from "./auth";
 import { Train } from "@/server/db/schemas/trains";
 import { unstable_cache } from "next/cache";
-import { StationMode } from "../types";
+import { StationMode, StopWithStation } from "../types";
 import { ItemType } from "../satisfactory/data";
 
 export async function getTrains(projectId: number, ownerId: string) {
@@ -91,7 +91,8 @@ export async function updateTrain(train: Train) {
     .executeTakeFirst();
 }
 
-export async function getTrainTimetable(trainId: number, ownerId: string) {
+
+export async function getTrainTimetable(trainId: number, ownerId: string): Promise<StopWithStation[]> {
     return getDatabase()
     .selectFrom('train_timetable_stop')
     .innerJoin('train_station','train_timetable_stop.station_id','train_station.id')
@@ -106,7 +107,9 @@ export async function getTrainTimetable(trainId: number, ownerId: string) {
     .execute();
 }
 
-export async function getTrainTimetableStop(stopId: number, ownerId: string) {
+
+
+export async function getTrainTimetableStop(stopId: number, ownerId: string): Promise<StopWithStation | undefined> {
     return getDatabase()
     .selectFrom('train_timetable_stop')
     .innerJoin('train_station','train_station.id','train_timetable_stop.station_id')
@@ -153,6 +156,22 @@ export async function addTimetableStop(trainId: number, stationId: number, owner
     })
     .returningAll()
     .executeTakeFirst();
+}
+
+export async function addTimetableStops(trainId: number, stationIds: number[], ownerId: string) {
+    const lastStop = await getLastTimetableStop(trainId, ownerId);
+    const position = (lastStop) ? lastStop.position + 1 : 1;   
+
+    return getDatabase()
+    .insertInto('train_timetable_stop')
+    .values(stationIds.map((stationId, idx) => ({
+        consist_id: trainId,
+        owner_id: ownerId,
+        position: position + idx,
+        station_id: stationId
+    })))
+    .returningAll()
+    .execute();
 }
 
 export async function repositionTimetableStop(stopId: number, newPosition: number, ownerId: string) {

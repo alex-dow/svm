@@ -33,7 +33,7 @@ export default async function StopAccordionTabHeader({
         {stopItems.map((item) => {
           const itemData = items[item.item_id];
           return (
-            <div className="p-overlay-badge" key={item.item_id}>
+            <div className="p-overlay-badge" key={item.mode + '-' +item.item_id}>
                 <Image 
                     src={"/data/items/" + itemData.icon + "_64.png"} 
                     

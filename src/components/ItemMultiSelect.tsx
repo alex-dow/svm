@@ -7,6 +7,7 @@ export interface ItemSelectProps {
     className?: string,
     id?: string,
     value: ItemType[],
+    loading?: boolean,
     onChange?: (items: ItemType[]) => void,
     itemFilter?: (item: IItemSchema) => boolean
 };
@@ -29,6 +30,7 @@ export function ItemMultiSelect(props: ItemSelectProps) {
                     props.onChange(e.value)
                 }
             }}
+            loading={props.loading}
             options={availableItems}
             optionLabel="name"
             optionValue="className"

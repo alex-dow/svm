@@ -2,7 +2,7 @@
 
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
-import { addTimetableStop, addTimetableStopItem, addTimetbleStopItems, createTrain, deleteTrain, getCachedTimetableStopItems, getCachedTrain, getCachedTrains, getCachedTrainTimetable, getTimetableStopItem, getTrain, getTrainTimetableStop, removeTimetableStop, removeTimetableStopItem, repositionTimetableStop, updateTrain } from "../services/trains";
+import { addTimetableStop, addTimetableStopItem, addTimetableStops, addTimetbleStopItems, createTrain, deleteTrain, getCachedTimetableStopItems, getCachedTrain, getCachedTrains, getCachedTrainTimetable, getTimetableStopItem, getTrain, getTrainTimetableStop, removeTimetableStop, removeTimetableStopItem, repositionTimetableStop, updateTrain } from "../services/trains";
 import { StationMode } from "../types";
 import { ItemType } from "../satisfactory/data";
 
@@ -66,6 +66,17 @@ export interface HandleAddStopParams {
     stationId: number,
     loadingItems?: ItemType[],
     unloadingItems?: ItemType[]
+}
+
+export interface HandleAddStopsParams {
+    trainId: number,
+    stationIds: number[]
+}
+
+export async function handleAddStops({trainId, stationIds}: HandleAddStopsParams) {
+    const user = await getCurrentUser();
+    await addTimetableStops(trainId, stationIds, user.id);
+    revalidateTag(`train-timetable:${trainId}`);
 }
 
 export async function handleAddStop({trainId, stationId, loadingItems, unloadingItems}: HandleAddStopParams) {

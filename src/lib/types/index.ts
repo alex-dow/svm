@@ -27,5 +27,14 @@ export interface NetworkOverviewItem {
     item_id: ItemType,
     rate: number,
     mode: StationMode,
-    position: number
+    position: number,
+    station_id: number
+}
+
+export type StopWithStation = {
+    id: number;
+    station_id: number;
+    consist_id: number;
+    position: number;
+    station_name: string;
 }

@@ -1,6 +1,5 @@
 'use client';
-import { ItemType } from "@/lib/satisfactory/data";
-import { NetworkOverviewItem, StationMode } from "@/lib/types";
+import { NetworkOverviewItem } from "@/lib/types";
 import { Checkbox } from "primereact/checkbox";
 import { TabPanel, TabView } from "primereact/tabview";
 import { useEffect, useState } from "react";
@@ -11,9 +10,9 @@ import NetworkOverviewGroupedList from "./NetworkOverviewGroupedList";
 export default function NetworkOverviewContainer({ items }: { items: NetworkOverviewItem[] }) {
     const [ groupByPlatform, setGroupByPlatform ] = useState(false);
 
-    const [ loadingItems, setLoadingItems ] = useState<{item_id: ItemType, rate: number, mode: StationMode, position: number}[]>([]);
-    const [ unloadingItems, setUnloadingItems ] = useState<{item_id: ItemType, rate: number, mode: StationMode, position: number}[]>([]);
-    const [ availabilityItems, setAvailabilityItems ] = useState<{item_id: ItemType, rate: number, mode: StationMode, position: number}[]>([]);
+    const [ loadingItems, setLoadingItems ] = useState<NetworkOverviewItem[]>([]);
+    const [ unloadingItems, setUnloadingItems ] = useState<NetworkOverviewItem[]>([]);
+    const [ availabilityItems, setAvailabilityItems ] = useState<NetworkOverviewItem[]>([]);
 
     const [ loadingItemsGrouped, setLoadingItemsGrouped ] = useState<NetworkOverviewItem[][]>([]);
     const [ unloadingItemsGrouped, setUnloadingItemsGrouped ] = useState<NetworkOverviewItem[][]>([]);

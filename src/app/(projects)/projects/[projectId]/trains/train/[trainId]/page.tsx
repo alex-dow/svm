@@ -32,7 +32,7 @@ export default async function TrainPage({
                                 className: 'items-center'
                             }
                         }}>
-                            <StopItems projectId={projectId} trainId={trainId} stopId={stop.id}/>
+                            <StopItems stop={stop}/>
                         </AccordionTab>
                     ))}
                 </Accordion>

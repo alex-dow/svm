@@ -2,6 +2,7 @@ import { getDatabase } from "@/server/db";
 import { getCurrentUser } from "./auth";
 import { CreateTrainStation } from "@/server/db/schemas/trainStations";
 import { unstable_cache } from "next/cache";
+import { NetworkOverviewItem } from "../types";
 
 export async function getTrainStations(projectId: number, ownerId: string) {
     return getDatabase()
@@ -88,7 +89,7 @@ export const getCachedTrainStation = (stationId: number, ownerId: string) => uns
     }
 )(stationId, ownerId);
 
-export async function getAllTrainStationItems(stationId: number, ownerId: string) {
+export async function getAllTrainStationItems(stationId: number, ownerId: string): Promise<NetworkOverviewItem[]> {
     return getDatabase()
     .selectFrom('train_station_platform_item')
     .innerJoin('train_station_platform','train_station_platform_item.platform_id','train_station_platform.id')
@@ -96,6 +97,8 @@ export async function getAllTrainStationItems(stationId: number, ownerId: string
     .select('item_id')
     .select('train_station.id as station_id')
     .select('train_station_platform.mode as mode')
+    .select('train_station_platform.position as position')
+    .select('train_station_platform_item.rate as rate')
     .where('train_station.id','=',stationId)
     .where('train_station_platform_item.owner_id', '=', ownerId)
     .execute();

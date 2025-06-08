@@ -1,19 +1,12 @@
 'use client';
 import { useState } from "react";
-import MultiItemModal from "../MultiItemModal";
 import { Button } from "primereact/button";
-import { StationMode } from "@/lib/types";
-import { handleAddStopItems } from "@/lib/actions/trains";
-import { IItemSchema } from "@/lib/types/satisfactory/schema/IItemSchema";
-import { ItemType } from "@/lib/satisfactory/data";
+import { StationMode, StopWithStation } from "@/lib/types";
+import TimetableStopItemModal from "./modals/TimetableStopItemModal";
 
-export default function AddStopItemButton({stopId, mode}: {stopId: number, mode: StationMode}) {
+export default function AddStopItemButton({stop, mode}: {stop: StopWithStation, mode: StationMode}) {
 
     const [showModal, setShowModal] = useState(false);
-
-    const onSave = async (items: IItemSchema[]) => {
-        await handleAddStopItems(stopId, items.map(item => ({itemId: item.className as ItemType, mode})));
-    }
 
     return (
         <>
@@ -27,7 +20,8 @@ export default function AddStopItemButton({stopId, mode}: {stopId: number, mode:
                     height: '2rem', width: '1rem', padding: '1rem'
                 }}
             />
-            <MultiItemModal onHide={() => setShowModal(false)} visible={showModal} onSave={onSave}/>
+            <TimetableStopItemModal visible={showModal} onHide={() => setShowModal(false)} stop={stop} mode={mode}/>
+            
         </>
     )
 }

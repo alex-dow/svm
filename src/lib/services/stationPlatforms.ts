@@ -2,6 +2,7 @@ import { getDatabase } from "@/server/db";
 import { getCurrentUser } from "./auth";
 import { unstable_cache } from "next/cache";
 import { ItemType } from "../satisfactory/data";
+import { NetworkOverviewItem } from "../types";
 
 export async function getTrainStationPlatforms(stationId: number, ownerId: string) {
     return getDatabase()
@@ -241,7 +242,7 @@ export const getCachedStationPlatformItems = (platformId: number, ownerId: strin
 
 
 
-export async function getAllPlatformItems(projectId: number, ownerId: string) {
+export async function getAllPlatformItems(projectId: number, ownerId: string): Promise<NetworkOverviewItem[]> {
     return getDatabase()
     .selectFrom('train_station')
     .innerJoin('train_station_platform', 'train_station_platform.train_station_id', 'train_station.id')
@@ -250,6 +251,7 @@ export async function getAllPlatformItems(projectId: number, ownerId: string) {
     .select('train_station_platform_item.rate')
     .select('train_station_platform.mode')
     .select('train_station_platform.position')
+    .select('train_station.id as station_id')
     .where('train_station.project_id','=',projectId)
     .where('train_station.owner_id','=',ownerId)
     .execute();
