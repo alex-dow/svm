@@ -1,6 +1,5 @@
 import { NetworkOverviewItem } from "@/lib/types";
 import { Accordion, AccordionTab } from "primereact/accordion";
-import { useEffect, useState } from "react";
 import NetworkOverviewListItem from "./NetworkOverviewListItem";
 import Image from "next/image";
 import { items as itemData } from "@/lib/satisfactory/data";

@@ -1,4 +1,3 @@
-import { Splitter, SplitterPanel } from "primereact/splitter";
 import { Suspense } from "react";
 import Loading from "@/components/Loading";
 import TrainStationsList from "@/components/trains/TrainStationsList";
@@ -7,7 +6,6 @@ import TrainsList from "@/components/trains/TrainsList";
 import AddTrainStationButton from "@/components/trains/AddTrainStationButton";
 import AddTrainButton from "@/components/trains/AddTrainButton";
 import { headers } from "next/headers";
-import { Button } from "primereact/button";
 import NetworkOverview from "@/components/trains/NetworkOverview";
 
 export default async function TrainsRootLayout({

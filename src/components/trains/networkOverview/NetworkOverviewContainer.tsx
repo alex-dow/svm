@@ -1,11 +1,9 @@
 'use client';
-import { ItemLabel } from "@/components/ItemLabel";
 import { ItemType } from "@/lib/satisfactory/data";
 import { NetworkOverviewItem, StationMode } from "@/lib/types";
 import { Checkbox } from "primereact/checkbox";
 import { TabPanel, TabView } from "primereact/tabview";
 import { useEffect, useState } from "react";
-import NetworkOverviewListItem from "./NetworkOverviewListItem";
 import NetworkOverviewUngroupedList from "./NetworkOverviewUngroupedList";
 import NetworkOverviewGroupedList from "./NetworkOverviewGroupedList";
 
