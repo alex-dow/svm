@@ -2,6 +2,7 @@
 
 import ItemModal, { ItemModalOnSaveArgs } from "@/components/ItemModal";
 import { handleAddPlatformItem } from "@/lib/actions/trainStations";
+import { ItemType } from "@/lib/satisfactory/data";
 //import { addStationPlatformItem } from "@/lib/services/stationPlatforms";
 import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
@@ -13,7 +14,7 @@ export function AddItemButton({platformId}: {platformId: number}) {
 
     const onSave = async (e: ItemModalOnSaveArgs) => {
         try {
-            await handleAddPlatformItem(platformId, e.item.className, e.rate);
+            await handleAddPlatformItem(platformId, e.item.className as ItemType, e.rate);
         } catch (err) {
             if (err instanceof Error) {
                 toast.current?.show({ severity: 'error', summary: 'Error', detail: err.message });

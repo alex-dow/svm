@@ -3,6 +3,7 @@
  * defined here
  */
 
+import { ItemType } from "@/lib/satisfactory/data"
 import { StationMode } from ".."
 
 
@@ -21,12 +22,12 @@ export interface ImportTrainTimetableStop {
     /**
      * List of item ids the train is loading at this stop
      */
-    loadingItems: string[],
+    loadingItems: ItemType[],
 
     /**
      * List of item ids the train is unloading at this stop
      */
-    unloadingItems: string[]
+    unloadingItems: ItemType[]
 }
 
 /**

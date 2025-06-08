@@ -1,6 +1,7 @@
 import { getDatabase } from "@/server/db";
 import { getCurrentUser } from "./auth";
 import { unstable_cache } from "next/cache";
+import { ItemType } from "../satisfactory/data";
 
 export async function getTrainStationPlatforms(stationId: number, ownerId: string) {
     return getDatabase()
@@ -205,7 +206,7 @@ export async function removeStationPlatform(platformId: number, ownerId: string)
     });
 }
 
-export async function addStationPlatformItem(platformId: number, itemId: string, rate: number, ownerId: string) {
+export async function addStationPlatformItem(platformId: number, itemId: ItemType, rate: number, ownerId: string) {
     const db = getDatabase();
 
     await db.insertInto('train_station_platform_item').values({

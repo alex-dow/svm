@@ -2,6 +2,7 @@ import { BoolProperty, ObjectProperty, Parser, SatisfactorySave, SaveComponent, 
 import { getErrorMessage, sendEvent } from "./base";
 import { TimeTableStop, TrainDockingRuleSet } from "@/lib/types/satisfactory/saveFileTypes";
 import { ImportTrain, ImportTrainStation, ImportTrainStationPlatform, ImportTrainTimetableStop } from "@/lib/types/satisfactory/importSaveTypes";
+import { ItemType } from "@/lib/satisfactory/data";
 
 /**
  * This worker will collect the following data:
@@ -159,13 +160,13 @@ export function getTimetableStops(mStops: StructArrayProperty): ImportTrainTimet
         const loadingItems = dockingRulesSet.properties.LoadFilterDescriptors.values
         .filter((desc) => desc.pathName != '/Game/FactoryGame/Resource/FilteringRules/Desc_None.Desc_None_C')
         .map((desc) => {
-            return desc.pathName.split('.').pop() as string;
+            return desc.pathName.split('.').pop() as ItemType;
         });
 
         const unloadingItems = dockingRulesSet.properties.UnloadFilterDescriptors.values
         .filter((desc) => desc.pathName != '/Game/FactoryGame/Resource/FilteringRules/Desc_None.Desc_None_C')
         .map((desc) => {
-            return desc.pathName.split('.').pop() as string;
+            return desc.pathName.split('.').pop() as ItemType;
         });
 
         return {

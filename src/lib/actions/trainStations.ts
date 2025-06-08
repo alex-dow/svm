@@ -3,6 +3,7 @@ import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
 import { createTrainStation, deleteTrainStation,  getCachedAllTrainStationItems,  getCachedTrainStation,  getCachedTrainStations,  getTrainStation } from "../services/stations";
 import { addStationPlatform, addStationPlatformItem, countStationPlatforms, getCachedTrainStationPlatforms, getStationPlatformItem, getStationPlatformItems, getTrainStationPlatform, removeStationPlatform, removeStationPlatformItem, repositionStationPlatform, setPlatformMode } from "../services/stationPlatforms";
+import { ItemType } from "../satisfactory/data";
 
 
 export async function handleGetTrainStations(projectId: number) {
@@ -86,7 +87,7 @@ export async function handleGetPlatformItems(platformId: number) {
     
 }
 
-export async function handleAddPlatformItem(platformId: number, itemId: string, rate: number) {
+export async function handleAddPlatformItem(platformId: number, itemId: ItemType, rate: number) {
     const user = await getCurrentUser();
     const platform = await getTrainStationPlatform(platformId, user.id);
     if (!platform) throw new Error('Platform not found');

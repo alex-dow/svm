@@ -1,3 +1,4 @@
+import { ItemType } from "@/lib/satisfactory/data";
 import { StationMode } from "@/lib/types";
 import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
@@ -24,7 +25,7 @@ export type UpdateTrainStationPlatform = Updateable<TrainStationPlatformTable>;
 
 export interface TrainStationPlatformItemTable {
     id: Generated<number>;
-    item_id: string;
+    item_id: ItemType;
     rate: number;
     platform_id: number;
     owner_id: string;
