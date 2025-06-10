@@ -1,7 +1,6 @@
 import { ItemType } from "@/lib/satisfactory/data";
 import { getCurrentUser } from "@/lib/services/auth";
 import { getStationsByItemClassname } from "@/lib/services/stations";
-import { getDatabase } from "@/server/db";
 import { NextRequest, NextResponse } from "next/server";
 
 // For now just trains
