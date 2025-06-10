@@ -43,13 +43,13 @@ export default function TimetableStopItemModal({visible, onHide, stop, mode}: Ti
 
 
     const itemFilter = (item: IItemSchema) => {
-        return stationItems.findIndex((stationItem) => stationItem.item_id === item.className) > -1;
+        return stationItems.findIndex((stationItem) => stationItem.item_classname === item.className) > -1;
     }
 
     const onSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try{
-            await handleAddStopItems(stop.id, selectedItems.map((item) => ({itemId: item, mode})));
+            await handleAddStopItems(stop.id, selectedItems.map((item) => ({itemClassname: item, mode})));
             onHide();
         } catch (err) {
             console.error(err);

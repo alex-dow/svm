@@ -24,7 +24,8 @@ export interface SaveFileWorkerCommand<T> {
 }
 
 export interface NetworkOverviewItem {
-    item_id: ItemType,
+    id: number,
+    item_classname: ItemType,
     rate: number,
     mode: StationMode,
     position: number,

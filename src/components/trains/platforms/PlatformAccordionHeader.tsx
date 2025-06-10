@@ -33,12 +33,12 @@ export default async function PlatformAccordionHeader({
       </div>
       <div className="flex gap-1 flex-1 w-1/3">
           {platformItems.map((item) => {
-            const itemData = items[item.item_id];
+            const itemData = items[item.item_classname];
             return (
-              <div className="p-overlay-badge" key={item.item_id}>
+              <div className="p-overlay-badge" key={item.item_classname}>
                 <Image 
                   src={"/data/items/" + itemData.icon + "_64.png"} 
-                  key={item.item_id} 
+                  key={item.item_classname} 
                   alt={itemData.name} 
                   width={32} 
                   height={32}

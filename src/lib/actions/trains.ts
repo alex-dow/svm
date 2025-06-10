@@ -125,7 +125,7 @@ export async function handleAddStopItem(stopId: number, itemId: ItemType, mode: 
     revalidateTag(`timetable-stop-items:${stopId}`)
 }
 
-export async function handleAddStopItems(stopId: number, items: {itemId: ItemType, mode: StationMode}[]) {
+export async function handleAddStopItems(stopId: number, items: {itemClassname: ItemType, mode: StationMode}[]) {
     const user = await getCurrentUser();
     await addTimetbleStopItems(stopId, items, user.id);
     revalidateTag(`timetable-stop-items:${stopId}`)

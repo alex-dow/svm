@@ -31,9 +31,9 @@ export default async function StopAccordionTabHeader({
       </div>
       <div className="flex flex-1 gap-2">
         {stopItems.map((item) => {
-          const itemData = items[item.item_id];
+          const itemData = items[item.item_classname];
           return (
-            <div className="p-overlay-badge" key={item.mode + '-' +item.item_id}>
+            <div className="p-overlay-badge" key={item.mode + '-' +item.item_classname}>
                 <Image 
                     src={"/data/items/" + itemData.icon + "_64.png"} 
                     

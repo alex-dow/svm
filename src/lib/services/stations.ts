@@ -3,6 +3,7 @@ import { getCurrentUser } from "./auth";
 import { CreateTrainStation } from "@/server/db/schemas/trainStations";
 import { unstable_cache } from "next/cache";
 import { NetworkOverviewItem } from "../types";
+import { ItemType } from "../satisfactory/data";
 
 export async function getTrainStations(projectId: number, ownerId: string) {
     return getDatabase()
@@ -94,7 +95,8 @@ export async function getAllTrainStationItems(stationId: number, ownerId: string
     .selectFrom('train_station_platform_item')
     .innerJoin('train_station_platform','train_station_platform_item.platform_id','train_station_platform.id')
     .innerJoin('train_station','train_station_platform.train_station_id','train_station.id')
-    .select('item_id')
+    .select('train_station_platform_item.id as id')
+    .select('train_station_platform_item.item_classname as item_classname')
     .select('train_station.id as station_id')
     .select('train_station_platform.mode as mode')
     .select('train_station_platform.position as position')
@@ -112,3 +114,23 @@ export const getCachedAllTrainStationItems = (stationId: number, ownerId: string
         tags: [`train-station-items:${stationId}`]
     }
 )(stationId, ownerId);
+
+export async function getStationsByItemClassname(itemClassName: ItemType, projectId: number, ownerId: string) {
+    return getDatabase()
+    .selectFrom('train_station_platform_item')
+    .innerJoin('train_station_platform','train_station_platform.id','train_station_platform_item.platform_id')
+    .innerJoin('train_station','train_station.id','train_station_platform.train_station_id')
+    .select('train_station_platform_item.id as item_id')
+    .select('train_station_platform_item.rate as rate')
+    .select('train_station_platform_item.item_classname as item_classname')
+    .select('train_station_platform.position as position')
+    .select('train_station_platform.mode as platform_mode')
+    .select('train_station.name as station_name')
+    .select('train_station.id as station_id')
+    .where('item_classname','=',itemClassName)
+    .where('train_station.project_id','=',projectId)
+    .where('train_station_platform_item.owner_id','=',ownerId)
+    .execute();
+}
+
+export type StationsByItem = Awaited<ReturnType<typeof getStationsByItemClassname>>;

@@ -30,7 +30,7 @@ export interface TrainTimetableStopItemTable {
     id: Generated<number>;
     stop_id: number;
     owner_id: string;
-    item_id: ItemType;
+    item_classname: ItemType;
     mode: StationMode
 }
 

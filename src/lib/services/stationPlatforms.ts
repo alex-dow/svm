@@ -203,11 +203,11 @@ export async function removeStationPlatform(platformId: number, ownerId: string)
     });
 }
 
-export async function addStationPlatformItem(platformId: number, itemId: ItemType, rate: number, ownerId: string) {
+export async function addStationPlatformItem(platformId: number, itemClassname: ItemType, rate: number, ownerId: string) {
     const db = getDatabase();
 
     await db.insertInto('train_station_platform_item').values({
-        item_id: itemId,
+        item_classname: itemClassname,
         owner_id: ownerId,
         platform_id: platformId,
         rate: rate,
@@ -247,7 +247,8 @@ export async function getAllPlatformItems(projectId: number, ownerId: string): P
     .selectFrom('train_station')
     .innerJoin('train_station_platform', 'train_station_platform.train_station_id', 'train_station.id')
     .innerJoin('train_station_platform_item', 'train_station_platform_item.platform_id', 'train_station_platform.id')
-    .select('train_station_platform_item.item_id')
+    .select('train_station_platform_item.id as id')
+    .select('train_station_platform_item.item_classname')
     .select('train_station_platform_item.rate')
     .select('train_station_platform.mode')
     .select('train_station_platform.position')

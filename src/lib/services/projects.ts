@@ -11,6 +11,7 @@ import {
   ImportTrainStation,
 } from "../types/satisfactory/importSaveTypes";
 import { CreateTrainTimetableStopItem } from "@/server/db/schemas/trains";
+import { ExportTimetableStop, ExportTrain, ExportTrainStation, ExportTrainStationPlatform } from "../types/exports";
 
 export async function createProject(projectName: string, ownerId: string) {
   const db = getDatabase();
@@ -96,41 +97,92 @@ export const exportProject = async (projectId: number, ownerId: string) => {
     throw new Error('Project not found: ' + projectId);
   }
 
-  const [trains, trainStations, trainStationPlatforms, trainStationPlatformItems, trainTimetableStops, trainTimestampStopItems] = await Promise.all([
+  const [trains, trainStations] = await Promise.all([
     db.selectFrom('train')
-    .select(['id','name'])
+    .select(['id','name','wagons'])
+    .where('project_id','=',projectId)
+    .where('owner_id','=',ownerId)
     .execute(),
+
     db.selectFrom('train_station')
-    .select(['id','name'])
-    .execute(),
+    .select(['id', 'name'])
+    .where('project_id','=',projectId)
+    .where('owner_id','=',ownerId)
+    .execute()
+  ]);
+
+  const trainIds = trains.map((train) => train.id);
+  const trainStationIds = trainStations.map((station) => station.id);
+
+  const [ trainStationPlatforms, trainTimetableStops ] = await Promise.all([
     db.selectFrom('train_station_platform')
-    .select(['id','mode','position','train_station_id'])
+    .select(['id', 'mode', 'position', 'train_station_id'])
+    .where('train_station_id','in',trainStationIds)
     .execute(),
-    db.selectFrom('train_station_platform_item')
-    .select(['id','item_id','platform_id','rate'])
-    .execute(),
+
     db.selectFrom('train_timetable_stop')
     .select(['id','consist_id','position','station_id'])
-    .execute(),
-    db.selectFrom('train_timetable_stop_item')
-    .select(['id','item_id','mode','stop_id'])
+    .where('consist_id','in',trainIds)
     .execute()
-  ])
+  ]);
+
+  const platformIds = trainStationPlatforms.map((platform) => platform.id);
+  const trainTimetableStopIds = trainTimetableStops.map((stop) => stop.id);
+
+  const [ trainStationPlatformItems, trainTimetableStopItems ] = await Promise.all([
+    db.selectFrom('train_station_platform_item')
+    .select(['id','item_classname','platform_id','rate'])
+    .where('platform_id','in', platformIds)
+    .execute(),
+
+    db.selectFrom('train_timetable_stop_item')
+    .select(['id','item_classname','mode','stop_id'])
+    .where('stop_id','in', trainTimetableStopIds)
+    .execute()
+  ]);
+
+    const mappedTrainStations = trainStations.reduce((a, train) => {
+        const stationPlatforms = trainStationPlatforms
+            .filter((platform) => platform.train_station_id === train.id)
+            .reduce((a, platform) => {
+                const items = trainStationPlatformItems
+                                           .filter((item) => item.platform_id === platform.id);
+                a.push({
+                    ...platform,
+                    items
+                });
+                return a;
+            }, [] as ExportTrainStationPlatform[])
+
+        a.push({...train, platforms: stationPlatforms})
+        
+        return a;
+    }, [] as ExportTrainStation[]);
+
+    const mappedTrains = trains.reduce((a, train) => {
+
+        const timetable = trainTimetableStops.reduce((a, stop) => {
+            const items = trainTimetableStopItems.filter((item) => item.stop_id === stop.id);
+            a.push({...stop, items});
+            return a;
+        }, [] as ExportTimetableStop[])
+
+        a.push({...train, timetable});
+        return a;
+    }, [] as ExportTrain[])  
+
 
   return {
     projectName: project.name,
-    trains,
-    trainTimetableStops,
-    trainTimestampStopItems,
-    trainStations,
-    trainStationPlatforms,
-    trainStationPlatformItems,
-  
+    trains: mappedTrains,
+    trainStations: mappedTrainStations
   }
 
 
   
 };
+
+export type ProjectExport = Awaited<ReturnType<typeof exportProject>>;
 
 export interface ImportProjectParameters {
   projectName: string;
@@ -257,7 +309,7 @@ export const importSaveFileProject = async ({
                   return {
                     owner_id: ownerId,
                     stop_id: stop.id,
-                    item_id: item,
+                    item_classname: item,
                     mode: "loading" as StationMode, // <-- why do I need to do this?
                   };
                 })
@@ -268,7 +320,7 @@ export const importSaveFileProject = async ({
                   return {
                     owner_id: ownerId,
                     stop_id: stop.id,
-                    item_id: item,
+                    item_classname: item,
                     mode: "unloading" as StationMode,
                   };
                 })

@@ -45,7 +45,7 @@ export default async function StopItems({stop}: StopItemsProps) {
                         <StopItem 
                             key={item.id} 
                             itemId={item.id} 
-                            itemLabel={items[item.item_id].name || item.item_id}
+                            itemLabel={items[item.item_classname].name || item.item_classname}
                         />
                     ))}
                 </ul>
@@ -61,7 +61,7 @@ export default async function StopItems({stop}: StopItemsProps) {
                         <StopItem 
                             key={item.id} 
                             itemId={item.id} 
-                            itemLabel={items[item.item_id].name || item.item_id}
+                            itemLabel={items[item.item_classname].name || item.item_classname}
                         />
                     ))}
                 </ul>

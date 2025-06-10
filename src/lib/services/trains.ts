@@ -215,11 +215,11 @@ export async function repositionTimetableStop(stopId: number, newPosition: numbe
     .execute();
 }
 
-export async function addTimetableStopItem(stopId: number, itemId: ItemType, mode: StationMode, ownerId: string) {
+export async function addTimetableStopItem(stopId: number, itemClassname: ItemType, mode: StationMode, ownerId: string) {
     return getDatabase()
     .insertInto('train_timetable_stop_item')
     .values({
-        item_id: itemId,
+        item_classname: itemClassname,
         stop_id: stopId,
         owner_id: ownerId,
         mode: mode
@@ -228,11 +228,11 @@ export async function addTimetableStopItem(stopId: number, itemId: ItemType, mod
     .executeTakeFirst();
 }
 
-export async function addTimetbleStopItems(stopId: number, items: {itemId: ItemType, mode: StationMode}[], ownerId: string) {
+export async function addTimetbleStopItems(stopId: number, items: {itemClassname: ItemType, mode: StationMode}[], ownerId: string) {
     return getDatabase()
     .insertInto('train_timetable_stop_item')
     .values(items.map(item => ({
-        item_id: item.itemId,
+        item_classname: item.itemClassname,
         stop_id: stopId,
         owner_id: ownerId,
         mode: item.mode

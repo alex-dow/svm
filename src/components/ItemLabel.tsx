@@ -1,6 +1,6 @@
 'use client';
 import { items } from "@/lib/satisfactory/data";
 
-export function ItemLabel({itemId}: {itemId: keyof typeof items}) {
-    return (<>{items[itemId]?.name || itemId}</>)
+export function ItemLabel({itemClassname}: {itemClassname: keyof typeof items}) {
+    return (<>{items[itemClassname]?.name || itemClassname}</>)
 }

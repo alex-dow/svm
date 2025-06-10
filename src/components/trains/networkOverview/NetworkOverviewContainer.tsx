@@ -5,9 +5,15 @@ import { TabPanel, TabView } from "primereact/tabview";
 import { useEffect, useState } from "react";
 import NetworkOverviewUngroupedList from "./NetworkOverviewUngroupedList";
 import NetworkOverviewGroupedList from "./NetworkOverviewGroupedList";
+import { ItemStationMapModal } from "../modals/ItemStationMapModal";
+import { useParams } from "next/navigation";
 
 
 export default function NetworkOverviewContainer({ items }: { items: NetworkOverviewItem[] }) {
+
+    const params = useParams<{projectId: string}>();
+    const projectId = parseInt(params.projectId);
+
     const [ groupByPlatform, setGroupByPlatform ] = useState(false);
 
     const [ loadingItems, setLoadingItems ] = useState<NetworkOverviewItem[]>([]);
@@ -18,6 +24,14 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
     const [ unloadingItemsGrouped, setUnloadingItemsGrouped ] = useState<NetworkOverviewItem[][]>([]);
     const [ availabilityItemsGrouped, setAvailabilityItemsGrouped ] = useState<NetworkOverviewItem[][]>([]);
 
+    const [ selectedItemForStatioMap, setSelectedItemForStationMap ] = useState<NetworkOverviewItem>();
+    const [ showItemStationMap, setShowItemStationMap ] = useState(false);
+
+    const onItemClick = (item: NetworkOverviewItem) => {
+        setSelectedItemForStationMap(item);
+        setShowItemStationMap(true);
+    }
+
     useEffect(() => {
 
         const li = {} as Record<string, NetworkOverviewItem>;
@@ -26,23 +40,23 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
 
         items.forEach((item) => {
             if (item.mode === 'loading') {
-                if (!li[item.item_id]) {
-                    li[item.item_id] = {...item};
+                if (!li[item.item_classname]) {
+                    li[item.item_classname] = {...item};
                 } else {
-                    li[item.item_id].rate += item.rate;
+                    li[item.item_classname].rate += item.rate;
                 }
             } else if (item.mode === 'unloading') {
-                if (!ui[item.item_id]) {
-                    ui[item.item_id] = {...item};
+                if (!ui[item.item_classname]) {
+                    ui[item.item_classname] = {...item};
                 } else {
-                    ui[item.item_id].rate += item.rate;
+                    ui[item.item_classname].rate += item.rate;
                 }
             }
 
-            if (!ai[item.item_id]) {
-                ai[item.item_id] = (item.mode === 'loading') ? {...item} : {...item, rate: -item.rate};
+            if (!ai[item.item_classname]) {
+                ai[item.item_classname] = (item.mode === 'loading') ? {...item} : {...item, rate: -item.rate};
             } else {
-                ai[item.item_id].rate += (item.mode === 'loading') ? item.rate : -item.rate;
+                ai[item.item_classname].rate += (item.mode === 'loading') ? item.rate : -item.rate;
             }
         });
         setLoadingItems(Object.values(li).sort((a,b) => a.rate > b.rate ? -1 : 1));
@@ -61,20 +75,20 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
                         acc.loading[pos] = {} as Record<string, NetworkOverviewItem>;
                     }
 
-                    if (acc.loading[pos][item.item_id]) {
-                        acc.loading[pos][item.item_id].rate += item.rate;
+                    if (acc.loading[pos][item.item_classname]) {
+                        acc.loading[pos][item.item_classname].rate += item.rate;
                     } else {
-                        acc.loading[pos][item.item_id] = {...item};
+                        acc.loading[pos][item.item_classname] = {...item};
                     }
                 } else if (item.mode === 'unloading') {
                     if (!acc.unloading[pos]) {
                         acc.unloading[pos] = {} as Record<string, NetworkOverviewItem>;
                     }
 
-                    if (acc.unloading[pos][item.item_id]) {
-                        acc.unloading[pos][item.item_id].rate += item.rate;
+                    if (acc.unloading[pos][item.item_classname]) {
+                        acc.unloading[pos][item.item_classname].rate += item.rate;
                     } else {
-                        acc.unloading[pos][item.item_id] = {...item};
+                        acc.unloading[pos][item.item_classname] = {...item};
                     }
                 }
 
@@ -82,13 +96,13 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
                     acc.availability[pos] = {};
                 }
 
-                if (!acc.availability[pos][item.item_id]) {
-                    acc.availability[pos][item.item_id] = {...item, rate: item.mode === 'loading' ? item.rate : -item.rate};
+                if (!acc.availability[pos][item.item_classname]) {
+                    acc.availability[pos][item.item_classname] = {...item, rate: item.mode === 'loading' ? item.rate : -item.rate};
                 } else {
                     if (item.mode === 'loading') {
-                        acc.availability[pos][item.item_id].rate += item.rate;
+                        acc.availability[pos][item.item_classname].rate += item.rate;
                     } else {
-                        acc.availability[pos][item.item_id].rate -= item.rate;
+                        acc.availability[pos][item.item_classname].rate -= item.rate;
                     }
                 }
                 
@@ -117,7 +131,7 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
            
             <TabView pt={{
                 panelContainer: {
-                className: 'p-1'
+                className: 'p-0'
                 },
                 
             }}>
@@ -126,27 +140,29 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
                     className: 'p-2'
                 }
                 }}>
-                    {!groupByPlatform && <NetworkOverviewUngroupedList items={loadingItems} />}
-                    {groupByPlatform && <NetworkOverviewGroupedList items={loadingItemsGrouped} />}
+                    {!groupByPlatform && <NetworkOverviewUngroupedList items={loadingItems} onItemClick={onItemClick}/>}
+                    {groupByPlatform && <NetworkOverviewGroupedList items={loadingItemsGrouped} onItemClick={onItemClick}/>}
                 </TabPanel>
                 <TabPanel header="Unloading" pt={{
                 headerAction: {
                     className: 'p-2'
                 }
                 }}>
-                    {!groupByPlatform && <NetworkOverviewUngroupedList items={unloadingItems} />}
-                    {groupByPlatform && <NetworkOverviewGroupedList items={unloadingItemsGrouped} />}
+                    {!groupByPlatform && <NetworkOverviewUngroupedList items={unloadingItems} onItemClick={onItemClick}/>}
+                    {groupByPlatform && <NetworkOverviewGroupedList items={unloadingItemsGrouped} onItemClick={onItemClick}/>}
                 </TabPanel>          
                 <TabPanel header="Availability" pt={{
                 headerAction: {
                     className: 'p-2'
                 }
                 }}>
-                    {!groupByPlatform && <NetworkOverviewUngroupedList items={availabilityItems} />}
-                    {groupByPlatform && <NetworkOverviewGroupedList items={availabilityItemsGrouped} />}
+                    {!groupByPlatform && <NetworkOverviewUngroupedList items={availabilityItems} onItemClick={onItemClick}/>}
+                    {groupByPlatform && <NetworkOverviewGroupedList items={availabilityItemsGrouped} onItemClick={onItemClick}/>}
                 </TabPanel>              
             </TabView>
             
+            <ItemStationMapModal projectId={projectId} visible={showItemStationMap} onHide={() => setShowItemStationMap(false)} item={selectedItemForStatioMap} />
+
         </div>
     )
 }

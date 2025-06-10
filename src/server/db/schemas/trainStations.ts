@@ -25,7 +25,7 @@ export type UpdateTrainStationPlatform = Updateable<TrainStationPlatformTable>;
 
 export interface TrainStationPlatformItemTable {
     id: Generated<number>;
-    item_id: ItemType;
+    item_classname: ItemType;
     rate: number;
     platform_id: number;
     owner_id: string;
