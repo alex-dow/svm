@@ -42,3 +42,9 @@ export interface ExportTimetableStop {
     consist_id: number,
     items: ExportTimetableStopItem[]
 }
+
+export interface ExportProject {
+    projectName: string,
+    trains: ExportTrain[],
+    trainStations: ExportTrainStation[]
+}

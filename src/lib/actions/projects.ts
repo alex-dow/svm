@@ -2,7 +2,7 @@
 
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
-import { createProject, deleteProject, exportProject, getCachedProject, getCachedProjects, getProject, importSaveFileProject, updateProject } from "../services/projects";
+import { createProject, deleteProject, exportProject, getCachedProject, getCachedProjects, getProject, importProject, importSaveFileProject, ProjectExport, updateProject } from "../services/projects";
 import { Project } from "@/server/db/schemas/projects";
 import { ImportTrain, ImportTrainStation } from "../types/satisfactory/importSaveTypes";
 
@@ -70,4 +70,10 @@ export async function handleImportSaveFileProject({projectName, saveFileTrainSta
     revalidateTag(`projects:${user.id}`)
 
     return projectId;
+}
+
+export async function handleImportProject(exportProject: ProjectExport) {
+    const user = await getCurrentUser();
+    return importProject(exportProject, user.id);
+
 }

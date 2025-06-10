@@ -89,6 +89,82 @@ export async function updateProject(project: Project) {
   return getProject(project.id, project.owner_id);
 }
 
+export const importProject = async (projectExport: ProjectExport, ownerId: string) => {
+  const db = getDatabase();
+  const project = await createProject(projectExport.projectName, ownerId);
+  if (!project) {
+    throw new Error('Project not created');
+  }
+
+  return db.transaction().execute(async (trx) => {
+    const trainStations = await trx
+      .insertInto('train_station')
+      .values(projectExport.trainStations.map((ts) => {
+        return {
+          name: ts.name,
+          owner_id: ownerId,
+          project_id: project.id
+        }
+      }))
+      .returningAll()
+      .execute();
+
+    const flattenedPlatforms = projectExport.trainStations.reduce((a, ts) => {
+      a.push(...ts.platforms);
+      return a;
+    },[] as ExportTrainStationPlatform[]);
+
+    const platforms = await trx
+      .insertInto('train_station_platform')
+      .values(flattenedPlatforms.map((platform) => {
+
+        const stationIdx = projectExport.trainStations.findIndex((ts) => ts.id === platform.train_station_id);
+        if (stationIdx === -1) {
+          throw new Error('Platform #' + platform.id + ' is mapped to train station #' + platform.train_station_id + ' but this train station does not exist in the project export');
+        }
+
+        const newStation = trainStations[stationIdx];
+        if (!newStation) {
+          throw new Error('Platform #' + platform.id + ' is mapped to train station #' + platform.train_station_id + ' but this train station does not exist in the list of newly created train stations');
+        }
+
+        return {
+          mode: platform.mode,
+          owner_id: ownerId,
+          position: platform.position,
+          train_station_id: newStation.id
+        }
+      }))
+      .returningAll()
+      .execute();
+
+    for (let i = 0; i < flattenedPlatforms.length; i++) {
+      const items = flattenedPlatforms[i].items;
+      if (items && items.length > 0) {
+        await trx.insertInto('train_station_platform_item')
+        .values(items.map((item) => {
+          const newPlatformId = platforms[i]?.id;
+          if (!newPlatformId) {
+            throw new Error('Item #' + item.id + ' can not find its platform');
+          }
+          return {
+            item_classname: item.item_classname,
+            owner_id: ownerId,
+            platform_id: newPlatformId,
+            rate: item.rate
+
+          }
+        }))
+        .returningAll()
+        .execute();
+      }
+    }
+
+    return project.id;
+  })
+}
+
+
 export const exportProject = async (projectId: number, ownerId: string) => {
   const db = getDatabase();
   
