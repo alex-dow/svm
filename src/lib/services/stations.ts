@@ -134,3 +134,4 @@ export async function getStationsByItemClassname(itemClassName: ItemType, projec
 }
 
 export type StationsByItem = Awaited<ReturnType<typeof getStationsByItemClassname>>;
+export type StationByItem = StationsByItem[0];
