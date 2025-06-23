@@ -8,6 +8,7 @@ import { Button } from "primereact/button";
 import { Toast } from "primereact/toast";
 import { useRef, useState } from "react";
 
+
 export function AddItemButton({platformId}: {platformId: number}) {
     const [ showItemModal, setShowItemModal ] = useState(false);
     const toast = useRef<Toast>(null);
@@ -24,15 +25,27 @@ export function AddItemButton({platformId}: {platformId: number}) {
         }
     }
 
+    const onClick = (e: React.MouseEvent) => {
+        e.preventDefault();
+        e.stopPropagation();
+        setShowItemModal(true);
+    }
+
     return (
-        <>
+        <div>
             <Toast ref={toast} />
-            <Button label="Add Item" onClick={() => setShowItemModal(true)}/>
+            <Button 
+                icon="pi pi-plus"
+                outlined
+                title="Add item"
+                onClick={onClick}
+                className="p-1 pt-1.5 w-8"
+            />
             <ItemModal
                 visible={showItemModal} 
                 onHide={() => setShowItemModal(false)} 
                 onSave={onSave}
             />
-        </>
+        </div>
     )
 }

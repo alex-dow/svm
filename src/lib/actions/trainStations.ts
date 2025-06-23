@@ -2,7 +2,7 @@
 import { revalidateTag } from "next/cache";
 import { getCurrentUser } from "../services/auth";
 import { createTrainStation, deleteTrainStation,  getCachedAllTrainStationItems,  getCachedTrainStation,  getCachedTrainStations,  getTrainStation } from "../services/stations";
-import { addStationPlatform, addStationPlatformItem, countStationPlatforms, getAllPlatformItems, getCachedTrainStationPlatforms, getStationPlatformItem, getStationPlatformItems, getTrainStationPlatform, removeStationPlatform, removeStationPlatformItem, repositionStationPlatform, setPlatformMode } from "../services/stationPlatforms";
+import { addStationPlatform, addStationPlatformItem, countStationPlatforms, getAllPlatformItems, getCachedTrainStationPlatforms, getStationPlatformItem, getStationPlatformItems, getTrainStationPlatform, removeStationPlatform, removeStationPlatformItem, repositionStationPlatform, setPlatformMode, updateStationPlatformItem } from "../services/stationPlatforms";
 import { ItemType } from "../satisfactory/data";
 
 
@@ -96,6 +96,16 @@ export async function handleAddPlatformItem(platformId: number, itemId: ItemType
     if (!platform) throw new Error('Platform not found');
 
     await addStationPlatformItem(platformId, itemId, rate, user.id);
+    revalidateTag(`train-station-platform-items:${platformId}`)
+    revalidateTag(`train-station-items:${platform.train_station_id}`);
+}
+
+export async function handleUpdatePlatformItem(platformId: number, itemId: number, rate: number) {
+    const user = await getCurrentUser();
+    const platform = await getTrainStationPlatform(platformId, user.id);
+    if (!platform) throw new Error('Platform not found');
+
+    await updateStationPlatformItem(platformId, itemId, rate, user.id);
     revalidateTag(`train-station-platform-items:${platformId}`)
     revalidateTag(`train-station-items:${platform.train_station_id}`);
 }

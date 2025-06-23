@@ -214,6 +214,16 @@ export async function addStationPlatformItem(platformId: number, itemClassname: 
     }).execute();
 }
 
+export async function updateStationPlatformItem(platformId: number, itemId: number, rate: number, ownerId: string) {
+    const db = getDatabase();
+
+    await db.updateTable('train_station_platform_item')
+    .set({ rate })
+    .where('id','=',itemId)
+    .where('owner_id','=',ownerId)
+    .execute();
+}
+
 export async function getStationPlatformItem(itemId: number, ownerId: string) {
     return getDatabase()
     .selectFrom('train_station_platform_item')

@@ -6,6 +6,7 @@ import { handleGetPlatformItems } from "@/lib/actions/trainStations";
 import { items } from "@/lib/satisfactory/data";
 import Image from "next/image";
 import { Badge } from "primereact/badge";
+import { AddItemButton } from "./buttons/AddItemButton";
 
 export default async function PlatformAccordionHeader({
   platform,
@@ -55,6 +56,7 @@ export default async function PlatformAccordionHeader({
 
       </div>      
       <div className="flex gap-1 justify-end">
+        <AddItemButton platformId={platform.id} />
         <TogglePlatformModeButton platformId={platform.id} mode={platform.mode}/>
         <MovePlatformButton disabled={platform.position == totalPlatforms} direction="down" platformId={platform.id} position={platform.position}/>
         <MovePlatformButton disabled={platform.position == 1} direction="up" platformId={platform.id} position={platform.position}/>

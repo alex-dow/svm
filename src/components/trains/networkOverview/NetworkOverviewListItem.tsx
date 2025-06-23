@@ -1,3 +1,4 @@
+import ItemIcon from "@/components/ItemIcon";
 import { ItemLabel } from "@/components/ItemLabel";
 import { items } from "@/lib/satisfactory/data";
 import { NetworkOverviewItem } from "@/lib/types";
@@ -27,13 +28,7 @@ export default function NetworkOverviewListItem({
       onClick={onClick}
     >
       <div>
-        <Image
-          src={"/data/items/" + itemIcon + "_64.png"}
-          width={24}
-          height={24}
-          alt={items[item.item_classname].name}
-          title={items[item.item_classname].name}
-        />
+        <ItemIcon itemClassname={item.item_classname} width={24} height={24} />
       </div>
       <div>
         <ItemLabel itemClassname={item.item_classname} />

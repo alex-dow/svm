@@ -1,4 +1,3 @@
-import PlatformAccordionTabHeader from "./PlatformAccordionTabHeader";
 import ItemsList from "./ItemsList";
 import { handleGetPlatformItems } from "@/lib/actions/trainStations";
 
@@ -6,11 +5,20 @@ export default async function PlatformAccordionTab({platformId}: {platformId: nu
 
     const items = await handleGetPlatformItems(platformId);
     
-    return (
-        <>
-            <PlatformAccordionTabHeader platformId={platformId} />
-            <ItemsList platformId={platformId} items={items}/>
-        </>
-    )
+    if (items.length === 0) {
+        return (
+            <>
+                <div>
+                    This platform is empty.
+                </div>
+            </>
+        );
+    } else {
+        return (
+            <>
+                <ItemsList platformId={platformId} items={items}/>
+            </>
+        );
+    }
 
 }

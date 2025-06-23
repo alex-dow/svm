@@ -35,15 +35,20 @@ export default async function StationsListPage({
   return (
     <>
       <StationPageHeader stationId={parseInt(stationId)} stationName={trainStation.name} />
-      <p>Total platforms: {platforms.length}</p>
       {platforms.length > 0 ? (
         <Accordion multiple>
           {platforms.map((platform) => (
             <AccordionTab
               pt={{
+                root: {
+                  className: 'mb-1'
+                },
                 headerAction: {
                   className: "p-2",
                 },
+                content: {
+                  className: 'p-1'
+                }
               }}
               header={
                 <PlatformAccordionHeader

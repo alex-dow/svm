@@ -7,6 +7,7 @@ import NetworkOverviewUngroupedList from "./NetworkOverviewUngroupedList";
 import NetworkOverviewGroupedList from "./NetworkOverviewGroupedList";
 import { ItemStationMapModal } from "../modals/ItemStationMapModal";
 import { useParams } from "next/navigation";
+import { RadioButton } from "primereact/radiobutton";
 
 
 export default function NetworkOverviewContainer({ items }: { items: NetworkOverviewItem[] }) {
@@ -15,6 +16,7 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
     const projectId = parseInt(params.projectId);
 
     const [ groupByPlatform, setGroupByPlatform ] = useState(false);
+    const [ sortBy, setSortBy ] = useState<'name' | 'rate'>('name');
 
     const [ loadingItems, setLoadingItems ] = useState<NetworkOverviewItem[]>([]);
     const [ unloadingItems, setUnloadingItems ] = useState<NetworkOverviewItem[]>([]);
@@ -34,34 +36,34 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
 
     useEffect(() => {
 
-        const li = {} as Record<string, NetworkOverviewItem>;
-        const ui = {} as Record<string, NetworkOverviewItem>;
-        const ai = {} as Record<string, NetworkOverviewItem>;
+        const loadingItems = {} as Record<string, NetworkOverviewItem>;
+        const unloadingItems = {} as Record<string, NetworkOverviewItem>;
+        const availabilityItems = {} as Record<string, NetworkOverviewItem>;
 
         items.forEach((item) => {
             if (item.mode === 'loading') {
-                if (!li[item.item_classname]) {
-                    li[item.item_classname] = {...item};
+                if (!loadingItems[item.item_classname]) {
+                    loadingItems[item.item_classname] = {...item};
                 } else {
-                    li[item.item_classname].rate += item.rate;
+                    loadingItems[item.item_classname].rate += item.rate;
                 }
             } else if (item.mode === 'unloading') {
-                if (!ui[item.item_classname]) {
-                    ui[item.item_classname] = {...item};
+                if (!unloadingItems[item.item_classname]) {
+                    unloadingItems[item.item_classname] = {...item};
                 } else {
-                    ui[item.item_classname].rate += item.rate;
+                    unloadingItems[item.item_classname].rate += item.rate;
                 }
             }
 
-            if (!ai[item.item_classname]) {
-                ai[item.item_classname] = (item.mode === 'loading') ? {...item} : {...item, rate: -item.rate};
+            if (!availabilityItems[item.item_classname]) {
+                availabilityItems[item.item_classname] = (item.mode === 'loading') ? {...item} : {...item, rate: -item.rate};
             } else {
-                ai[item.item_classname].rate += (item.mode === 'loading') ? item.rate : -item.rate;
+                availabilityItems[item.item_classname].rate += (item.mode === 'loading') ? item.rate : -item.rate;
             }
         });
-        setLoadingItems(Object.values(li).sort((a,b) => a.rate > b.rate ? -1 : 1));
-        setUnloadingItems(Object.values(ui).sort((a,b) => a.rate > b.rate ? -1 : 1));
-        setAvailabilityItems(Object.values(ai).sort((a,b) => a.rate > b.rate ? -1 : 1));
+        setLoadingItems(Object.values(loadingItems).sort((a,b) => a.rate > b.rate ? -1 : 1));
+        setUnloadingItems(Object.values(unloadingItems).sort((a,b) => a.rate > b.rate ? -1 : 1));
+        setAvailabilityItems(Object.values(availabilityItems).sort((a,b) => a.rate > b.rate ? -1 : 1));
 
     },[items]);
 
@@ -114,8 +116,6 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
                 'availability': {} as Record<number, Record<string, NetworkOverviewItem>>
             });
 
-            console.log('groupedby res:', res);
-
             setLoadingItemsGrouped(Object.values(res.loading).map((items) => Object.values(items)));
             setUnloadingItemsGrouped(Object.values(res.unloading).map((items) => Object.values(items)));
             setAvailabilityItemsGrouped(Object.values(res.availability).map((items) => Object.values(items)));
@@ -124,9 +124,21 @@ export default function NetworkOverviewContainer({ items }: { items: NetworkOver
     
     return (
         <div className="flex flex-col">
-            <div className="flex items-center gap-2">
-                <Checkbox checked={groupByPlatform} onChange={(e) => setGroupByPlatform(e.checked ?? false)} inputId="groupByPlatform" />
-                <label htmlFor="groupByPlatform">Group by platform</label>
+            <div className="flex gap-4 my-2">
+                <div className="flex items-center gap-2">
+                    <Checkbox checked={groupByPlatform} onChange={(e) => setGroupByPlatform(e.checked ?? false)} inputId="groupByPlatform" />
+                    <label htmlFor="groupByPlatform">Group by platform</label>
+                </div>
+                <div className="flex flex-1 flex-col gap-1">
+                    <div className="flex items-center flex-1 gap-2">
+                        <RadioButton inputId="sort-by-name" name="sort-by" value="name" onChange={(e) => setSortBy(e.value as 'name' | 'rate')} checked={sortBy === 'name'} />
+                        <label htmlFor="sort-by-name">Sort by name</label>
+                    </div>
+                    <div className="flex items-center flex-1 gap-2">
+                        <RadioButton inputId="sort-by-rate" name="sort-by" value="rate" onChange={(e) => setSortBy(e.value as 'name' | 'rate')} checked={sortBy === 'rate'} />
+                        <label htmlFor="sort-by-rate">Sort by rate</label>
+                    </div>
+                </div>
             </div>
            
             <TabView pt={{

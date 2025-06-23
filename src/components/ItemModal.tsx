@@ -46,10 +46,10 @@ export default function ItemModal(props: ItemModalProps) {
     }
 
     return (
-    <Dialog visible={props.visible} onHide={props.onHide} >
+    <Dialog visible={props.visible} onHide={props.onHide} header="Add item" onClick={(e) => e.stopPropagation()}>
         <form className="flex flex-col gap-2" onSubmit={onSave}>
             <ItemSelect value={selectedItemClassName} onChange={(e) => setSelectedItemClassName(e)}/>
-            <InputNumber value={rate} onChange={(e) => setRate(e.value)} placeholder="Rate" suffix=" / min"/>
+            <InputNumber value={rate} onChange={(e) => setRate(e.value)} placeholder="Rate" suffix=" / min" onKeyDown={(e) => e.stopPropagation()}/>
             <Button severity="help" label="Save" type="submit"/>
         </form>
     </Dialog>

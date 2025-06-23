@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { PrimeReactProvider } from "primereact/api";
-import "../styles/globals.css";
+import "./globals.css";
 import "primeicons/primeicons.css";
 
 export default function App({ 

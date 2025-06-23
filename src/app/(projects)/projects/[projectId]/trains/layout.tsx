@@ -54,12 +54,16 @@ export default async function TrainsRootLayout({
           </Suspense>
         </div>
       </div>
-      <div className="flex flex-col w-1/2">
+      <div className="relative w-1/2">
+        <div className="absolute top-0 left-0 right-0 bottom-0 overflow-y-auto flex flex-col">
 
-        { children }
+          { children }
+        </div>
       </div>
-      <div className="flex flex-col w-1/4">
-        <NetworkOverview projectId={projectId} />
+      <div className="relative w-1/4">
+        <div className="absolute top-0 left-0 right-0 bottom-0 overflow-y-auto flex flex-col">
+          <NetworkOverview projectId={projectId} />
+        </div>
       </div>
     </div>
   );

@@ -10,9 +10,11 @@ export interface TrainStationsListItemProps {
 export async function TrainStationsListItem({stationName, stationId, projectId}: TrainStationsListItemProps) {
 
     return (
-        <li className="flex justify-between items-center">
+        <li className="flex justify-between items-center ">
             <NavLink
                 href={'/projects/' + projectId + '/trains/stations/' + stationId}
+                
+                className="p-0.5 hover:bg-gray-800"
             >
                 {stationName}
             </NavLink>
