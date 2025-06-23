@@ -1,6 +1,5 @@
-import { BoolProperty, ObjectProperty, TextProperty } from "@etothepii/satisfactory-file-parser";
+import { ObjectProperty, TextProperty } from "@etothepii/satisfactory-file-parser";
 import { SaveItem } from "./pathTypes";
-import { ImportTrainStation, ImportTrainStationPlatform } from "@/lib/types/satisfactory/importSaveTypes";
 
 
 export function getNextPlatforms(connectionId: string, platformConnections: SaveItem[], platforms: SaveItem[]): SaveItem[] {

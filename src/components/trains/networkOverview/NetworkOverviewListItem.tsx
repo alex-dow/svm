@@ -1,8 +1,6 @@
 import ItemIcon from "@/components/ItemIcon";
 import { ItemLabel } from "@/components/ItemLabel";
-import { items } from "@/lib/satisfactory/data";
 import { NetworkOverviewItem } from "@/lib/types";
-import Image from "next/image";
 import React from "react";
 
 export interface NetworkOverviewListItemProps {
@@ -14,7 +12,6 @@ export default function NetworkOverviewListItem({
   item,
   onItemClick
 }: NetworkOverviewListItemProps) {
-  const itemIcon = items[item.item_classname].icon;
   const onClick = (e: React.MouseEvent) => {
     if (onItemClick) {
         e.preventDefault();

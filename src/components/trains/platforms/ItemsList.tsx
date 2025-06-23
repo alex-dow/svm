@@ -2,7 +2,6 @@ import { ItemLabel } from "@/components/ItemLabel";
 import { TrainStationPlatformItem } from "@/server/db/schemas/trainStations"; 
 import { DeleteItemButton } from "./buttons/DeleteItemButton";
 import ItemIcon from "@/components/ItemIcon";
-import { Inplace, InplaceContent, InplaceDisplay } from "primereact/inplace";
 import ItemListRate from "./ItemListRate";
 
 export default async function ItemsList({platformId, items}: {platformId: number, items: TrainStationPlatformItem[]}) {

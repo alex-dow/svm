@@ -63,7 +63,7 @@ export function ItemStationMapModal({projectId, item, visible, onHide}: ItemStat
                 <div key={station.station_id} className="flex gap-4 flex-1 items-start border-b-1 pb-1 pt-1 border-slate-600">
                     <div className="min-w-30">{ station.station_name }</div>
                     <div className="flex flex-col flex-1">
-                        {station.platforms.map((platform, pos) => (
+                        {station.platforms.map((platform) => (
                             <div className="flex items-center" key={platform.item_id}>
                                 <div className="text-sm font-light">
                                     Platform <strong>#{platform.position}</strong>
