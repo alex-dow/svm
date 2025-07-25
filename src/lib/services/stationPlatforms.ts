@@ -3,6 +3,8 @@ import { getCurrentUser } from "./auth";
 import { unstable_cache } from "next/cache";
 import { ItemType } from "../satisfactory/data";
 import { NetworkOverviewItem } from "../types";
+import { addTrainNetworkItemAmount, rebuildTrainNetwork, removeTrainNetworkItemAmount } from "./trainNetwork";
+import { getTrainStation } from "./stations";
 
 export async function getTrainStationPlatforms(stationId: number, ownerId: string) {
     return getDatabase()
@@ -175,6 +177,8 @@ export async function toggleStationPlatformMode(platformId: number) {
         .where('id','=',platformId)
         .execute();
 
+    rebuildTrainNetwork(platform.project_id as number, owner.id);
+
 }
 
 export async function removeStationPlatform(platformId: number, ownerId: string) {
@@ -182,11 +186,13 @@ export async function removeStationPlatform(platformId: number, ownerId: string)
 
     const platform = await db
         .selectFrom('train_station_platform')
-        .select('owner_id')
+        .innerJoin('train_station', 'train_station.id', 'train_station_platform.train_station_id')
+        .select('train_station.project_id')
+        .select('train_station_platform.owner_id')
         .select('position')
         .select('train_station_id')
-        .where('id','=',platformId)
-        .where('owner_id','=',ownerId)
+        .where('train_station_platform.id','=',platformId)
+        .where('train_station_platform.owner_id','=',ownerId)
         .executeTakeFirst();
 
     if (!platform) { throw new Error('Platform not found'); }
@@ -201,10 +207,17 @@ export async function removeStationPlatform(platformId: number, ownerId: string)
             .where('train_station_id','=',platform.train_station_id)
             .execute();
     });
+
+    await rebuildTrainNetwork(platform.project_id as number, ownerId);
 }
 
 export async function addStationPlatformItem(platformId: number, itemClassname: ItemType, rate: number, ownerId: string) {
     const db = getDatabase();
+
+    const platform = await getTrainStationPlatform(platformId, ownerId);
+    if (!platform) { throw new Error('Platform not found'); }
+    const station = await getTrainStation(platform.train_station_id, ownerId);
+    if (!station) { throw new Error('Station not found'); }
 
     await db.insertInto('train_station_platform_item').values({
         item_classname: itemClassname,
@@ -212,16 +225,36 @@ export async function addStationPlatformItem(platformId: number, itemClassname: 
         platform_id: platformId,
         rate: rate,
     }).execute();
+
+    addTrainNetworkItemAmount(station.project_id, itemClassname, platform.mode, rate, platform.position, ownerId);
 }
 
 export async function updateStationPlatformItem(platformId: number, itemId: number, rate: number, ownerId: string) {
     const db = getDatabase();
 
+    const platform = await getTrainStationPlatform(platformId, ownerId);
+    if (!platform) { throw new Error('Platform not found'); }
+    const station = await getTrainStation(platform.train_station_id, ownerId);
+    if (!station) { throw new Error('Station not found'); }
+    const platformItem = await getStationPlatformItem(itemId, ownerId);
+    if (!platformItem) { throw new Error('Platform item not found'); }
+
+
+    
     await db.updateTable('train_station_platform_item')
     .set({ rate })
     .where('id','=',itemId)
     .where('owner_id','=',ownerId)
     .execute();
+
+    const diff = rate - platformItem.rate;
+
+    if (rate > platformItem.rate) {
+        addTrainNetworkItemAmount(station.project_id, platformItem.item_classname, platform.mode, diff, platform.position, ownerId);
+    } else if (rate < platformItem.rate) {
+        removeTrainNetworkItemAmount(station.project_id, platformItem.item_classname, platform.mode, Math.abs(diff), platform.position, ownerId);
+    }
+    // if diff is 0 there is nothing to do
 }
 
 export async function getStationPlatformItem(itemId: number, ownerId: string) {

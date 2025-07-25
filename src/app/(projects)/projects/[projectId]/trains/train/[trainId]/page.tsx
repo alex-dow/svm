@@ -1,4 +1,4 @@
-import AddStopButton from "@/components/trains/AddStopButton";
+import AddStopButton from "@/components/trains/buttons/AddStopButton";
 import StopAccordionTabHeader from "@/components/trains/timetable/StopAccordionTabHeader";
 import StopItems from "@/components/trains/timetable/StopItems";
 import { handleGetTimetable } from "@/lib/actions/trains";

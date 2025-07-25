@@ -140,7 +140,7 @@ export default function ImportSaveFile({visible, onHide, header}: ImportSaveFile
             )}
 
             { phase === 'parsing-finished' && (
-                <SelectImportableItems trainStations={trainStations} trains={trains} onImportItems={onImportItems} saveName={saveName}/>
+                <SelectImportableItems trainStations={trainStations} trains={trains} onCancel={() => setPhase('new')} onImportItems={onImportItems} saveName={saveName}/>
             )}
 
             { phase === 'importing' && (

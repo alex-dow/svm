@@ -2,9 +2,9 @@
 
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import ButtonWithBusyModal from "../buttons/ButtonWithBusyModal";
 
 import { handleDeleteTrainStation } from "@/lib/actions/trainStations";
+import ConfirmButton from "@/components/buttons/ConfirmButton";
 
 export interface DeleteStationButtonProps {
     stationId: number,
@@ -25,6 +25,6 @@ export default function DeleteStationButton({stationId, projectId}: DeleteStatio
     }
 
     return (
-        <ButtonWithBusyModal icon="pi pi-trash" severity="danger" onClick={onDelete} progressMessage="Deleting ..."/>
+        <ConfirmButton icon="pi pi-trash" severity="danger" accept={onDelete} message="Are you sure you want to delete this station?" outlined/>
     )
 }

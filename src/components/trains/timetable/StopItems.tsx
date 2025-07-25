@@ -1,7 +1,7 @@
 import { handleGetStopItems } from "@/lib/actions/trains";
 import { TrainTimetableStopItem } from "@/server/db/schemas/trains";
 import { DeleteStopItemButton } from "../platforms/buttons/DeleteStopItemButton";
-import AddStopItemButton from "../AddStopItemButton";
+import AddStopItemButton from "../buttons/AddStopItemButton";
 import { items } from "@/lib/satisfactory/data";
 import { StopWithStation } from "@/lib/types";
 

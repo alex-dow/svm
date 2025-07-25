@@ -38,7 +38,7 @@ export type UpdateSession = Updateable<SessionTable>
 export interface UserTable {
   createdAt: string;
   email: string;
-  emailVerified: number;
+  emailVerified: boolean;
   id: string;
   image: string | null;
   name: string;

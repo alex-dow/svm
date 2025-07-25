@@ -3,8 +3,8 @@ import Loading from "@/components/Loading";
 import TrainStationsList from "@/components/trains/TrainStationsList";
 import { TabPanel, TabView } from "primereact/tabview";
 import TrainsList from "@/components/trains/TrainsList";
-import AddTrainStationButton from "@/components/trains/AddTrainStationButton";
-import AddTrainButton from "@/components/trains/AddTrainButton";
+import AddTrainStationButton from "@/components/trains/buttons/AddTrainStationButton";
+import AddTrainButton from "@/components/trains/buttons/AddTrainButton";
 import { headers } from "next/headers";
 import NetworkOverview from "@/components/trains/NetworkOverview";
 

@@ -1,6 +1,7 @@
 import Loading from "@/components/Loading";
 import "./globals.css";
 import { Suspense } from "react";
+import { ConfirmPopup } from "primereact/confirmpopup";
 
 export default async function RootLayout({
   children,
@@ -18,7 +19,7 @@ export default async function RootLayout({
       >
         
           <Suspense fallback={<Loading/>}>
-
+            <ConfirmPopup />
             {children}
           </Suspense>
         

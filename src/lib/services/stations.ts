@@ -115,6 +115,15 @@ export const getCachedAllTrainStationItems = (stationId: number, ownerId: string
     }
 )(stationId, ownerId);
 
+export async function updateTrainStationName(stationId: number, stationName: string, ownerId: string) {
+    return getDatabase()
+    .updateTable('train_station')
+    .set({name: stationName})
+    .where('id','=',stationId)
+    .where('owner_id','=',ownerId)
+    .execute();
+}
+
 export async function getStationsByItemClassname(itemClassName: ItemType, projectId: number, ownerId: string) {
     return getDatabase()
     .selectFrom('train_station_platform_item')

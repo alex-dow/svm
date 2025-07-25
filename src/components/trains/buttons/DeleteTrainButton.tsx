@@ -2,7 +2,7 @@
 
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
-import ButtonWithBusyModal from "../buttons/ButtonWithBusyModal";
+import ButtonWithBusyModal from "../../buttons/ButtonWithBusyModal";
 import { handleDeleteTrain } from "@/lib/actions/trains";
 
 export interface DeleteTrainButtonProps {

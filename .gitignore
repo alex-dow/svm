@@ -44,3 +44,5 @@ next-env.d.ts
 
 # svm sqlite db
 svm.db
+
+testsave.sav.json

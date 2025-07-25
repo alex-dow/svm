@@ -2,7 +2,7 @@ import { Kysely, PostgresDialect, SqliteDialect } from "kysely";
 import SQLLite from 'better-sqlite3';
 import { ProjectTable } from "./schemas/projects";
 import { TrainStationPlatformItemTable, TrainStationPlatformTable, TrainStationTable } from "./schemas/trainStations";
-import { TrainTable, TrainTimetableStopItemTable, TrainTimetableStopTable } from './schemas/trains';
+import { TrainNetworkItemTable, TrainTable, TrainTimetableStopItemTable, TrainTimetableStopTable } from './schemas/trains';
 import { AccountTable, SessionTable, UserTable, VerificationTable } from "./schemas/users";
 import { Pool } from 'pg';
 
@@ -11,6 +11,7 @@ export interface SVMDatabase {
     train_station: TrainStationTable,
     train_station_platform: TrainStationPlatformTable
     train_station_platform_item: TrainStationPlatformItemTable,
+    train_network_items: TrainNetworkItemTable,
     train: TrainTable,
     train_timetable_stop: TrainTimetableStopTable,
     train_timetable_stop_item: TrainTimetableStopItemTable,
@@ -44,7 +45,7 @@ export function getDatabase(dbUrl?: string): Kysely<SVMDatabase> {
 
             const kysely = new Kysely<SVMDatabase>({
                 dialect,
-                log: ['query','error']
+                log: ['error', 'query']
             });
 
             db = kysely;
@@ -63,7 +64,7 @@ export function getDatabase(dbUrl?: string): Kysely<SVMDatabase> {
 
             const kysely = new Kysely<SVMDatabase>({
                 dialect,
-                log: ['error','query']
+                log: ['error', 'query']
             });
             db = kysely;
         } else {

@@ -1,5 +1,5 @@
 import NavLink from "../layout/NavLink";
-import DeleteTrainButton from "./DeleteTrainButton";
+import DeleteTrainButton from "./buttons/DeleteTrainButton";
 
 export interface TrainsListItemProps {
     trainName: string,

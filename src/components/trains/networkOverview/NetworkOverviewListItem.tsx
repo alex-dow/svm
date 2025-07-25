@@ -1,15 +1,18 @@
+'use client';
 import ItemIcon from "@/components/ItemIcon";
 import { ItemLabel } from "@/components/ItemLabel";
-import { NetworkOverviewItem } from "@/lib/types";
+import { TrainNetworkItem } from "@/server/db/schemas/trains";
 import React from "react";
 
 export interface NetworkOverviewListItemProps {
-  item: NetworkOverviewItem;
-  onItemClick?: (item: NetworkOverviewItem) => void;
+  item: TrainNetworkItem;
+  mode: 'loading' | 'unloading' | 'availability';
+  onItemClick?: (item: TrainNetworkItem) => void;
 }
 
 export default function NetworkOverviewListItem({
   item,
+  mode,
   onItemClick
 }: NetworkOverviewListItemProps) {
   const onClick = (e: React.MouseEvent) => {
@@ -18,6 +21,8 @@ export default function NetworkOverviewListItem({
         onItemClick(item);
     }
   };
+
+  const rate = (mode === 'loading') ? item.loading_rate : (mode === 'unloading') ? item.unloading_rate : item.availability;
 
   return (
     <button
@@ -30,7 +35,7 @@ export default function NetworkOverviewListItem({
       <div>
         <ItemLabel itemClassname={item.item_classname} />
       </div>
-      <div className="flex-1 text-right">{item.rate} / min</div>
+      <div className="flex-1 text-right">{rate} / min</div>
     </button>
   );
 }

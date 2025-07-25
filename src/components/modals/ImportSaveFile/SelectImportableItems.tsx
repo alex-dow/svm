@@ -11,6 +11,7 @@ export interface SelectImportableItemsProps {
     trains: ImportTrain[],
     onImportItems: (e: {trainStations: ImportTrainStation[], trains: ImportTrain[]}) => void
     saveName: string
+    onCancel?: () => void
 }
 
 export interface ItemsHeaderProps {
@@ -70,7 +71,7 @@ return (
 }
 
 
-export default function SelectImportableItems({trainStations, trains, onImportItems, saveName}: SelectImportableItemsProps) {
+export default function SelectImportableItems({trainStations, trains, onImportItems, saveName, onCancel}: SelectImportableItemsProps) {
     const [ selectedTrainStations, setSelectedTrainStations ] = useState<string[]>([]);
     const [ selectedTrains, setSelectedTrains ] = useState<string[]>([]);
     const [ projectName, setProjectName ] = useState<string>(saveName);
@@ -85,7 +86,7 @@ export default function SelectImportableItems({trainStations, trains, onImportIt
     }
 
     return (
-        <div className="flex flex-1 flex-col gap-2">
+        <div className="flex flex-1 flex-col gap-4">
             
             <label htmlFor="project-name">Project name</label>
             <InputText value={projectName} onChange={(e) => setProjectName(e.target.value)} placeholder="Project name" id="project-name"/>
@@ -123,7 +124,10 @@ export default function SelectImportableItems({trainStations, trains, onImportIt
                 </AccordionTab>
 
             </Accordion>
-            <Button label="Create project" onClick={onClick}/>
+            <div className="flex justify-end gap-2">
+                <Button label="Select a different save file" onClick={(e) => { e.preventDefault(); onCancel?.()}}/>
+                <Button label="Create project" onClick={onClick}/>
+            </div>
         </div>
     )
 }

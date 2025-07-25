@@ -2,7 +2,7 @@
 import { useState } from "react";
 import { Button } from "primereact/button";
 import { StationMode, StopWithStation } from "@/lib/types";
-import TimetableStopItemModal from "./modals/TimetableStopItemModal";
+import TimetableStopItemModal from "../modals/TimetableStopItemModal";
 
 export default function AddStopItemButton({stop, mode}: {stop: StopWithStation, mode: StationMode}) {
 
