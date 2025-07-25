@@ -3,7 +3,7 @@ import { getCurrentUser } from "./auth";
 import { unstable_cache } from "next/cache";
 import { ItemType } from "../satisfactory/data";
 import { NetworkOverviewItem } from "../types";
-import { addTrainNetworkItemAmount, getTrainNetworkItem, rebuildTrainNetwork, removeTrainNetworkItemAmount } from "./trainNetwork";
+import { addTrainNetworkItemAmount, rebuildTrainNetwork, removeTrainNetworkItemAmount } from "./trainNetwork";
 import { getTrainStation } from "./stations";
 
 export async function getTrainStationPlatforms(stationId: number, ownerId: string) {

@@ -1,7 +1,6 @@
 'use client';
 import Loading from "@/components/Loading";
 import { StationByItem, type StationsByItem } from "@/lib/services/stations";
-import { NetworkOverviewItem } from "@/lib/types";
 import { TrainNetworkItem } from "@/server/db/schemas/trains";
 import { Badge } from "primereact/badge";
 import { Dialog } from "primereact/dialog";

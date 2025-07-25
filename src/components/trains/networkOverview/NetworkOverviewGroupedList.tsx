@@ -5,7 +5,6 @@ import Image from "next/image";
 import { items as itemData } from "@/lib/satisfactory/data";
 import { TrainNetworkItem } from "@/server/db/schemas/trains";
 import { useEffect, useState } from "react";
-import { resources, items } from "@/lib/satisfactory/data";
 import { sortItemsByName, sortItemsByRate } from "@/lib/sorters/networkItems";
 
 export function NetworkOverviewGroupedListHeader({items, position}: {items: TrainNetworkItem[], position: number}) {

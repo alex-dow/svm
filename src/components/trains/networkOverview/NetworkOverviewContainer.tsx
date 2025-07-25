@@ -1,8 +1,7 @@
 'use client';
-import { NetworkOverviewItem } from "@/lib/types";
 import { Checkbox } from "primereact/checkbox";
 import { TabPanel, TabView } from "primereact/tabview";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import NetworkOverviewUngroupedList from "./NetworkOverviewUngroupedList";
 import NetworkOverviewGroupedList from "./NetworkOverviewGroupedList";
 import { ItemStationMapModal } from "../modals/ItemStationMapModal";

@@ -76,8 +76,6 @@ export async function up(db: Kysely<any>) {
             }
         }
     }
-
-    await db.schema.dropTable('train_station_platform_item');
 }
 
 
