@@ -1,4 +1,4 @@
-import AddPlatformButton from "./AddPlatformButton";
+import AddPlatformButton from "./buttons/AddPlatformButton";
 
 export interface StationPageHeaderProps {
     stationId: number

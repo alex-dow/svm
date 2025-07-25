@@ -1,6 +1,6 @@
 'use client';
 import { Button } from "primereact/button";
-import NewTrainStationModal from "./modals/NewTrainStationModal";
+import NewTrainStationModal from "../modals/NewTrainStationModal";
 import { useState } from "react";
 
 export default function CreateStationButton({ projectId}: {projectId: number}) {

@@ -8,7 +8,7 @@ export default function NavLink({href, children, className}: {href: string, chil
     const pathname = usePathname();
 
     return (
-        <Link href={href} className={ className + ' ' + (pathname === href ? 'nav-link active' : 'nav-link')}>
+        <Link href={href} className={ className + ' ' + (pathname === href ? 'nav-link active' : 'nav-link')} onClick={(e) => e.stopPropagation()}>
             {children}
         </Link>
     )

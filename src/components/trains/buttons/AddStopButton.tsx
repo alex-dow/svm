@@ -1,7 +1,7 @@
 'use client';
 
 import { Button } from "primereact/button";
-import TimetableStopModal from "./modals/TimetableStopModal";
+import TimetableStopModal from "../modals/TimetableStopModal";
 import { useState } from "react";
 
 export default function AddStopButton({projectId, trainId}: {projectId: number, trainId: number}) {

@@ -2,7 +2,7 @@
 
 import { Button } from "primereact/button";
 import { useState } from "react";
-import NewTrainStationModal from "./modals/NewTrainStationModal";
+import NewTrainStationModal from "../modals/NewTrainStationModal";
 
 export default function AddTrainStationButton({projectId}: {projectId: number}) {
     const [ showModal, setShowModal ] = useState(false);

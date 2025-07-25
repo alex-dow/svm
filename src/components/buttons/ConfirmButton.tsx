@@ -22,6 +22,7 @@ export interface ConfirmButtonProps {
 
 export default function ConfirmButton(props: ConfirmButtonProps) {
     const onClick: MouseEventHandler = (e) => {
+        console.log('clicked');
         e.stopPropagation();
         e.preventDefault();
         confirmPopup({
@@ -35,7 +36,7 @@ export default function ConfirmButton(props: ConfirmButtonProps) {
 
     return (
         <>
-        <ConfirmPopup/>
+        
         <Button 
             label={props.label} 
             icon={props.icon} 
