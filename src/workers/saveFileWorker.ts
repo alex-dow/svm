@@ -180,11 +180,20 @@ export function getTimetableStops(mStops: StructArrayProperty): ImportTrainTimet
 
 
 export function buildTrain(train: SaveItem, wagons: SaveItem[], timetables: SaveItem[]): ImportTrain {
-    const mTrainName = train.properties['mTrainName'] as TextProperty;
+
+    let trainName: string;
+
+    if (!train.properties['mTrainName']) {
+        console.warn('train has no name', train);
+        trainName = 'Train';
+    } else {
+        const mTrainName = train.properties['mTrainName'] as TextProperty;
+        trainName = mTrainName.value?.value || 'unknown'
+    }
+    
     const firstVehicle = train.properties['FirstVehicle'] as ObjectProperty;
     const timeTable = train.properties['TimeTable'] as ObjectProperty;
 
-    const trainName = mTrainName.value.value || 'unknown'
     const instanceName = train.instanceName;
 
     const consistWagons = getTrainWagons(firstVehicle.value.pathName, wagons);
@@ -311,9 +320,11 @@ export async function dispatcher(e: MessageEvent<File>) {
         const collected = collectImportableItems(save);
 
         const trainStations = collected.trainStations.map((trainStation) => buildStation(trainStation, collected.platformConnections, collected.platforms));
+        trainStations.sort((a, b) => a.stationName.localeCompare(b.stationName));
         sendEvent('train-stations', trainStations);
         
         const trains = collected.trainConsists.map((trainConsist) => buildTrain(trainConsist, collected.wagons, collected.timetables));
+        trains.sort((a, b) => a.trainName.localeCompare(b.trainName));
         sendEvent('trains', trains);
         
         
