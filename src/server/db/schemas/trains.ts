@@ -2,8 +2,6 @@ import { ItemType } from "@/lib/satisfactory/data";
 import { StationMode } from "@/lib/types";
 import { Generated, Insertable, Selectable, Updateable } from "kysely";
 
-
-
 export interface TrainTable {
     id: Generated<number>;
     name: string;
@@ -37,3 +35,18 @@ export interface TrainTimetableStopItemTable {
 export type TrainTimetableStopItem = Selectable<TrainTimetableStopItemTable>;
 export type CreateTrainTimetableStopItem = Insertable<TrainTimetableStopItemTable>;
 export type UpateTrainTimetableStopItem = Updateable<TrainTimetableStopItemTable>;
+
+export interface TrainNetworkItemTable {
+    id: Generated<number>;
+    item_classname: ItemType;
+    project_id: number;
+    owner_id: string;
+    loading_rate: number;
+    unloading_rate: number;
+    availability: number;
+    platform_position: number;
+}
+
+export type TrainNetworkItem = Selectable<TrainNetworkItemTable>;   
+export type CreateTrainNetworkItem = Insertable<TrainNetworkItemTable>;
+export type UpdateTrainNetworkItem = Updateable<TrainNetworkItemTable>;
