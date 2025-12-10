@@ -1,0 +1,11 @@
+Satisfactory Vehicle Manager
+-------------------------------------------------------------------------------
+
+
+Someone has registered an account with Satisfactory Vehicle Manager using this email address.
+
+SVM requires all new employees to verify their email address before they can access the system.
+
+If you made this request, please click the link below or copy and paste the URL into your browser to verify your email address.
+            
+{{ url }}

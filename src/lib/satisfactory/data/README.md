@@ -1,0 +1,1 @@
+data is copied from https://satisfactory.wiki.gg/wiki/Module:DocsUtils

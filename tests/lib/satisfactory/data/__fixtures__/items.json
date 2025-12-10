@@ -1,0 +1,98 @@
+{
+	"Desc_IronIngot_C": [
+		{
+			"className": "Desc_IronIngot_C",
+			"name": "Iron Ingot",
+			"description": "Used for crafting the most basic parts.",
+			"unlockedBy": "Onboarding",
+			"stackSize": 100,
+			"energy": 0,
+			"radioactive": 0,
+			"canBeDiscarded": false,
+			"sinkPoints": 2,
+			"abbreviation": "Iron",
+			"form": "solid",
+			"fluidColor": "#ffffff",
+			"alienItem": false,
+			"stable": true,
+			"experimental": true
+		}
+	],
+	"Desc_Water_C": [
+		{
+			"className": "Desc_Water_C",
+			"name": "Water",
+			"description": "A basic resource, essential for life.",
+			"unlockedBy": "Onboarding",
+			"stackSize": 500,
+			"energy": 0,
+			"radioactive": 0,
+			"canBeDiscarded": false,
+			"sinkPoints": 0,
+			"abbreviation": null,
+			"form": "liquid",
+			"fluidColor": "#3d85c6",
+			"alienItem": false,
+			"stable": true,
+			"experimental": true
+		}
+	],
+	"Desc_NitrogenGas_C": [
+		{
+			"className": "Desc_NitrogenGas_C",
+			"name": "Nitrogen Gas",
+			"description": "A basic resource gas.",
+			"unlockedBy": "[[Tier 7]] - Bauxite Refinement",
+			"stackSize": 500,
+			"energy": 0,
+			"radioactive": 0,
+			"canBeDiscarded": false,
+			"sinkPoints": 0,
+			"abbreviation": null,
+			"form": "gas",
+			"fluidColor": "#ffffff",
+			"alienItem": false,
+			"stable": true,
+			"experimental": true
+		}
+	],
+	"Desc_AluminumIngot_C": [
+		{
+			"className": "Desc_AluminumIngot_C",
+			"name": "Aluminum Ingot",
+			"description": "Smelted from Aluminum Scrap.",
+			"unlockedBy": "[[Tier 7]] - Bauxite Refinement",
+			"stackSize": 100,
+			"energy": 0,
+			"radioactive": 0,
+			"canBeDiscarded": false,
+			"sinkPoints": 131,
+			"abbreviation": "AL",
+			"form": "solid",
+			"fluidColor": "#ffffff",
+			"alienItem": false,
+			"stable": true,
+			"experimental": true
+		}
+	],
+	"Desc_Cable_C": [
+		{
+			"className": "Desc_Cable_C",
+			"name": "Cable",
+			"description": "Used for crafting.",
+			"unlockedBy": "Onboarding",
+			"stackSize": 200,
+			"energy": 0,
+			"radioactive": 0,
+			"canBeDiscarded": false,
+			"sinkPoints": 6,
+			"abbreviation": null,
+			"form": "solid",
+			"fluidColor": "#ffffff",
+			"alienItem": false,
+			"stable": true,
+			"experimental": true
+		}
+	]
+}
+
