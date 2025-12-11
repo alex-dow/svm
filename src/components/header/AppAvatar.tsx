@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Avatar } from "primereact/avatar";
 import { Menu } from "primereact/menu";
 import { MenuItem } from "primereact/menuitem";
+import { Toast } from "primereact/toast";
 import { useRef } from "react";
 
 export interface AppAvatarProps {
@@ -13,6 +14,9 @@ export interface AppAvatarProps {
 
 export default function AppAvatar({ username }: AppAvatarProps) {
   const router = useRouter();
+  const menu = useRef<Menu>(null);
+  const toast = useRef<Toast>(null);
+
   let items: MenuItem[] = [];
   if (username) {
     items.push({
@@ -22,8 +26,20 @@ export default function AppAvatar({ username }: AppAvatarProps) {
           label: "Logout",
           icon: "pi pi-sign-out",
           command: async () => {
-            await authClient.signOut();
-            window.location.reload();
+            try {
+              const { error } = await authClient.signOut();
+              if (error) {
+                throw error;
+              }
+              window.location.reload();
+            } catch (err) {
+              toast.current!.show({
+                severity: "error",
+                summary: "Error",
+                detail:
+                  "An error occurred when trying to logout. You should reload this page.",
+              });
+            }
           },
         },
       ],
@@ -45,9 +61,9 @@ export default function AppAvatar({ username }: AppAvatarProps) {
     });
   }
 
-  const menu = useRef<Menu>(null);
   return (
     <>
+      <Toast ref={toast} />
       <Menu ref={menu} model={items} popup id="app-avatar-menu" />
       <Avatar
         icon="pi pi-user"
