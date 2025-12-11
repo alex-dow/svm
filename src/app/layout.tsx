@@ -1,7 +1,18 @@
-"use client";
+"use server";
+import AppAvatar from "@/components/header/AppAvatar";
 import "@/css/global.css";
+import { auth } from "@/lib/auth/server";
+import { headers } from "next/headers";
 
-export default function Layout({ children }: { children: React.ReactNode }) {
+export default async function Layout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  const username = session?.user?.name;
   return (
     <html lang="en">
       <head>
@@ -9,11 +20,10 @@ export default function Layout({ children }: { children: React.ReactNode }) {
         <title>Satisfactory Vehicle Manager</title>
       </head>
       <body className={`antialiased dark flex flex-col`}>
-        <header className="flex justify-between items-center gap-4">
+        <header className="flex justify-between items-center gap-4 border-b-2 border-b-amber-200 p-2">
           <div>Satisfactory Vehicle Manager</div>
           <div>
-            <a href="/login">Login</a>
-            <a href="/signup">Signup</a>
+            <AppAvatar username={username} />
           </div>
         </header>
 
