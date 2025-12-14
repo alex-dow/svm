@@ -4,6 +4,7 @@ import { username } from "better-auth/plugins";
 import { nextCookies } from "better-auth/next-js";
 import nodemailer from "nodemailer";
 import { emailVerificationTemplate } from "@/lib/auth/templates";
+import { headers } from "next/headers";
 
 const sendMail = async (
   from: string,
@@ -66,3 +67,9 @@ const options: BetterAuthOptions = {
 };
 
 export const auth = betterAuth(options);
+
+export async function getServerSession() {
+  return auth.api.getSession({
+    headers: await headers(),
+  });
+}
