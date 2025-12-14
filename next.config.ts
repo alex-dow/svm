@@ -1,6 +1,7 @@
 import type { NextConfig } from "next";
 const nextConfig: NextConfig = {
   reactStrictMode: true,
+  cacheComponents: true,
 
   webpack: (config) => {
     config.resolve.fallback = {
@@ -13,7 +14,7 @@ const nextConfig: NextConfig = {
   turbopack: {
     resolveAlias: {
       "stream/web": "web-streams-polyfill",
-      //'stream': 'stream-browersify'
+      stream: "stream-browserify",
     },
   },
 };

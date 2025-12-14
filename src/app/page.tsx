@@ -1,8 +1,15 @@
-export default function Home() {
-  return (
-    <div>
-      <h1>Satisfactory Vehicle Manager</h1>
-      <p>Welcome to Satisfactory Vehicle Manager</p>
-    </div>
-  );
+import GuestHome from "@/components/homePage/GuestHome";
+import UserHome from "@/components/homePage/UserHome";
+import { auth } from "@/lib/auth/server";
+import { headers } from "next/headers";
+
+export default async function Home() {
+  const session = await auth.api.getSession({
+    headers: await headers(),
+  });
+  if (session) {
+    return <UserHome user={session.user} />;
+  } else {
+    return <GuestHome />;
+  }
 }

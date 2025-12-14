@@ -22,7 +22,7 @@ async function migrateToLatest() {
       fs,
       path,
       migrationFolder: path.resolve(
-        __dirname,
+        import.meta.dirname,
         "../src/lib/db/migrations/",
         protocol
       ),
