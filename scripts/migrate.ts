@@ -5,7 +5,7 @@ console.log(process.env);
 
 import * as path from "path";
 import { promises as fs } from "fs";
-import { getDatabase } from "../srcold/server/db";
+import { getDatabase } from "../src/lib/db";
 
 import { FileMigrationProvider, Migrator } from "kysely";
 
