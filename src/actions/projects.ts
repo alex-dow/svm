@@ -1,7 +1,7 @@
 "use server";
 
 import { getServerSession } from "@/lib/auth/server";
-import { createProject, getProjects } from "@/lib/services/projects";
+import { createProject, getProject, getProjects } from "@/lib/services/projects";
 import { cacheTag } from "next/cache";
 
 export async function createProjectAction(name: string) {
@@ -20,6 +20,16 @@ export async function getProjectsAction() {
     throw new Error("Unauthorized");
   }
   const ownerId = session.user.id;
-  const projects = await getProjects(ownerId);
+  const projects = await getProjects({ownerId});
   return projects;
+}
+
+export async function getProjectAction(projectId: number) {
+  const session = await getServerSession();
+  if (!session) {
+    throw new Error("Unauthorized");
+  }
+  const ownerId = session.user.id;
+  const project = await getProject({ ownerId, projectId });
+  return project;
 }
