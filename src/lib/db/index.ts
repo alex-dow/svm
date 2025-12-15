@@ -1,5 +1,4 @@
-import { FileMigrationProvider, Kysely, Migrator, PostgresDialect, SqliteDialect } from "kysely";
-import SQLLite from 'better-sqlite3';
+import { FileMigrationProvider, Kysely, Migrator, PostgresDialect } from "kysely";
 import { ProjectTable } from "./schemas/projects";
 import { TrainStationPlatformItemTable, TrainStationPlatformTable, TrainStationTable } from "./schemas/trainStations";
 import { TrainNetworkItemTable, TrainTable, TrainTimetableStopItemTable, TrainTimetableStopTable } from './schemas/trains';
@@ -46,19 +45,7 @@ export function getDatabase(dbUrl?: string): Kysely<SVMDatabase> {
 
         const parsedUrl = new URL(dbUrl);
 
-        if (parsedUrl.protocol === "sqlite:") {
-
-            const dialect = new SqliteDialect({
-                database: new SQLLite(parsedUrl.pathname)
-            });
-
-            const kysely = new Kysely<SVMDatabase>({
-                dialect,
-                log: ['error', 'query']
-            });
-
-            db = kysely;
-        } else if (parsedUrl.protocol === 'postgres:') {
+        if (parsedUrl.protocol === 'postgres:') {
             const dialect = new PostgresDialect({
                 pool: new Pool({
                     database: parsedUrl.pathname.substring(1),
@@ -73,11 +60,11 @@ export function getDatabase(dbUrl?: string): Kysely<SVMDatabase> {
 
             const kysely = new Kysely<SVMDatabase>({
                 dialect,
-                log: ['error', 'query']
+                log: ['error']
             });
             db = kysely;
         } else {
-            throw new Error('Unknown database');
+            throw new Error('Unknown database type: ' + parsedUrl.protocol + ' - Supported types: postgres');
         }
     }
 

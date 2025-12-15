@@ -226,6 +226,7 @@ function SignupForm({
         type="submit"
         label={busy ? "Creating account ... " : "Sign up"}
         id="signup-submit"
+        
         disabled={!isValid || busy}
       />{" "}
       {busy && <ProgressSpinner />}

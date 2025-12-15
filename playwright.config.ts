@@ -1,24 +1,12 @@
 import { defineConfig, devices } from '@playwright/test';
+import { PostgreSqlContainer } from '@testcontainers/postgresql';
 import dotenv from 'dotenv';
+import { GenericContainer } from 'testcontainers';
+
 dotenv.config({ path: '.env.test' });
 
-if (!process.env.SMTP_API_PORT) {
-  console.warn('[warn] SMTP_API_PORT set to 8025');
-  process.env.SMTP_API_PORT = '8025';
-}
-
-if (!process.env.SMTP_FROM) {
-  console.warn('[warn] SMTP_FROM set to test@svm.com');
-  process.env.SMTP_FROM = 'test@svm.com';
-}
-
-if (!process.env.SMTP_PORT) {
-  console.warn('[warn] SMTP_PORT set to 1025');
-  process.env.SMTP_PORT = '1025';
-}
 
 export default defineConfig({
-  
   testDir: './e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -33,17 +21,23 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('')`. */
-    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:4000',
+    baseURL: process.env.PLAYWRIGHT_TEST_BASE_URL || 'http://localhost:3000',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry',
+
   },
+  
+
+  
 
   /* Configure projects for major browsers */
   projects: [
     {
+
       name: 'chromium',
       use: { ...devices['Desktop Chrome'] },
+
     },
 /*
     {
@@ -80,11 +74,19 @@ export default defineConfig({
 
   /* Run your local dev server before starting the tests */
   webServer: {
-    command: 'npm run dev:e2e',
-    url: 'http://localhost:4000',
+    command: 'npm run start',
+    url: 'http://localhost:3000',
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
     stderr: 'pipe',
     stdout: 'pipe',
+    env: {
+      SMTP_HOST: process.env.SMTP_HOST || '',
+      SMTP_PORT: process.env.SMTP_PORT || '',
+      SMTP_FROM: process.env.SMTP_FROM || '',
+      SMTP_API_PORT: process.env.SMTP_API_PORT || '',
+      PLAYWRIGHT_TEST_BASE_URL: process.env.PLAYWRIGHT_TEST_BASE_URL || '',
+    }
+
   },
 });

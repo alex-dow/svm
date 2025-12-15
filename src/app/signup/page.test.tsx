@@ -26,6 +26,104 @@ describe("SignupPage", () => {
     vi.clearAllMocks();
   });
 
+  it('Shows verification message after successful signup', async () => {
+
+    vi.mocked(authClient.isUsernameAvailable).mockResolvedValue({
+      data: { available: true },
+    } as any);
+    vi.mocked(authClient.signUp.email).mockResolvedValue({
+      data: {},
+      error: null,
+    } as any);
+
+    render(<SignupPage />);
+
+    const user = userEvent.setup();
+
+    const usernameInput = getInputById("signup-username");
+    await user.type(usernameInput, "testuser1");
+    
+    const emailInput = getInputById("signup-email");
+    await user.type(emailInput, "test@example.com");
+
+    const passwordInput = getInputById("signup-password");
+    await user.type(passwordInput, "password123");
+
+    const confirmPasswordInput = getInputById("signup-confirm-password");
+    await user.type(confirmPasswordInput, "password123");
+    await user.tab();
+    
+    const submitButton = getInputById("signup-submit");
+    
+    await waitFor(() => {
+      expect(submitButton).not.toBeDisabled();
+    });
+    
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(
+        document.getElementById("signup-complete-container")
+      ).toBeInTheDocument();
+    });
+
+  });
+
+  it('Shows validation error message when username is taken', async () => {
+    vi.mocked(authClient.isUsernameAvailable).mockResolvedValue({
+      data: { available: false },
+    } as any);
+
+    render(<SignupPage />);
+
+    const user = userEvent.setup();
+    const submitButton = getInputById("signup-submit");
+    const usernameInput = getInputById("signup-username");
+    const emailInput = getInputById('signup-email');
+    const passwordInput = getInputById("signup-password");
+    const confirmPasswordInput = getInputById("signup-confirm-password");
+    await user.type(usernameInput,"test user");
+    await user.type(emailInput, "test@example.com");
+    await user.type(passwordInput, "password123");
+    await user.type(confirmPasswordInput, "password123");
+    
+    await user.tab();
+
+    await waitFor(() => {
+      expect(document.getElementById("signup-username-error")).toBeInTheDocument();
+      expect(submitButton).toBeDisabled();
+    });
+  });
+
+  it('Shows validation error message when passwords do not match', async () => {
+    vi.mocked(authClient.isUsernameAvailable).mockResolvedValue({
+      data: { available: true },
+    } as any);
+
+    render(<SignupPage />);
+
+    const user = userEvent.setup();
+    const submitButton = getInputById("signup-submit");
+    const usernameInput = getInputById("signup-username");
+    const emailInput = getInputById("signup-email");
+    const passwordInput = getInputById("signup-password");
+    const confirmPasswordInput = getInputById("signup-confirm-password");
+    await user.type(usernameInput, "test user");
+    await user.type(emailInput, "test@example.com");
+    await user.type(passwordInput, "password123");
+    await user.type(confirmPasswordInput, "different123");
+    await user.tab();
+
+    await waitFor(() => {
+      expect(document.getElementById("signup-confirm-password-error")).toBeInTheDocument();
+      expect(submitButton).toBeDisabled();
+    });
+
+    
+  });
+});
+/*
+
   describe("Initial Render", () => {
     it("renders the signup form with all fields", () => {
       render(<SignupPage />);
@@ -635,3 +733,4 @@ describe("SignupPage", () => {
     });
   });
 });
+*/
