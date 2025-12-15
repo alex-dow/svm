@@ -46,7 +46,7 @@ console.log('env:', process.env);
 
   test("Prevents signup with existing username", async ({ page }) => {
     let usernameInput = page.locator("#signup-username");
-    await usernameInput.fill("testuser");
+    await usernameInput.fill("testuser2");
     const emailInput = page.locator("#signup-email");
     await emailInput.fill("test@example.com");
     const passwordInput = page.locator("#signup-password");
@@ -59,7 +59,7 @@ console.log('env:', process.env);
     await page.goto("/signup");
 
     usernameInput = page.locator("#signup-username");
-    await usernameInput.fill("testuser");
+    await usernameInput.fill("testuser2");
     await usernameInput.blur();
 
     await expect(page.locator("#signup-username-error")).toBeVisible();
