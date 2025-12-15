@@ -8,4 +8,4 @@ SVM requires all new employees to verify their email address before they can acc
 
 If you made this request, please click the link below or copy and paste the URL into your browser to verify your email address.
             
-{{ url }}
+{{url}}

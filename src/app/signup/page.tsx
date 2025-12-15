@@ -68,7 +68,7 @@ function SignupComplete() {
 }
 
 function SignupErrorMessage({ error }: { error: any }) {
-  return <Message severity="error" text={error.message} />;
+  return <Message severity="error" text={error.message} id="signup-error-message" />;
 }
 
 function SignupForm({
@@ -194,7 +194,7 @@ function SignupForm({
               autoComplete="off"
               feedback={false}
               toggleMask
-              id="signup-password"
+              inputId="signup-password"
             />
           )}
         />
@@ -216,7 +216,8 @@ function SignupForm({
               autoComplete="off"
               feedback={false}
               toggleMask
-              id="signup-confirm-password"
+              inputId="signup-confirm-password"
+              
             />
           )}
         />

@@ -15,16 +15,18 @@ export default function ProjectsList(props: ProjectsListProps) {
   const [visible, setVisible] = useState(false);
 
   return (
-    <div>
-      <h1>Projects List</h1>
-      <Button
-        label="New project"
-        onClick={() => setVisible(true)}
-        icon="pi pi-plus"
-      />
-      <div className="flex gap-4 p-4">
+    <div className="flex flex-col flex-1 p-4">
+      <div className="flex justify-between items-center">
+        <h1 className="text-xl font-bold">Projects</h1>
+        <Button
+          label="New project"
+          onClick={() => setVisible(true)}
+          icon="pi pi-plus"
+        />
+      </div>
+      <div className="flex gap-4">
         {projects.map((project) => (
-          <ProjectCard project={project} />
+          <ProjectCard project={project} key={project.id}/>
         ))}
       </div>
       <NewProjectModal visible={visible} setVisible={setVisible} />

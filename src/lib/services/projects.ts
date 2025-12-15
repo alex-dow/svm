@@ -24,6 +24,22 @@ export async function getProjects({ ownerId }: GetProjectsParams) {
   return query.execute();
 }
 
+export interface GetProjectParams {
+  ownerId: string;
+  projectId: number;
+}
+
+export async function getProject({ ownerId, projectId }: GetProjectParams) {
+  'use cache';
+  cacheTag("project-" + ownerId + "-" + projectId);
+  return getDatabase()
+    .selectFrom("project")
+    .selectAll()
+    .where("owner_id", "=", ownerId)
+    .where("id", "=", projectId)
+    .executeTakeFirstOrThrow();
+}
+
 export interface RenameProjectParams {
   projectId: number;
   ownerId: string;
@@ -77,6 +93,7 @@ export async function deleteProject({
   projectId,
 }: DeleteProjectParams) {
   updateTag("projects-" + ownerId);
+  updateTag('project-' + ownerId + '-' + projectId);
   if (!ownerId || !projectId) {
     throw new Error("Owner id and project id are required");
   }
