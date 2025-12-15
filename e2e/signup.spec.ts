@@ -58,7 +58,6 @@ test.describe("Login Workflow", () => {
     
 
     const emailMessage = await mailpit.getMessageSummary();
-    console.log('[E2E - Signup] Email message:', emailMessage);
 
     const dom = new jsdom.JSDOM(emailMessage.HTML);
     const document = dom.window.document;
@@ -68,14 +67,22 @@ test.describe("Login Workflow", () => {
     const verifyLinkUrl = verifyLink?.getAttribute("href");
     await expect(verifyLinkUrl).toBeTruthy();
 
-    
-
     await page.goto(verifyLinkUrl as string);
     await expect(page.locator('#login-verified-message')).toBeVisible();
+    await expect(page.url()).toContain("/login?verified=true");
 
+    const loginUsernameInput = page.locator("#login-username");
+    await loginUsernameInput.fill("testuser");
+    const loginPasswordInput = page.locator("#login-password");
+    await loginPasswordInput.fill("password123");
+    const loginButton = page.locator("#login-submit");
+    await loginButton.click();
+    await expect(page.url()).toContain("/");
+    
+    const appAvatar = page.locator("#app-avatar");
+    await expect(appAvatar).toHaveAttribute("data-username", "testuser");
 
-    //const successContainer = page.locator("#signup-complete-container");
-    //await expect(successContainer).toBeVisible();
+    
 
   });
 

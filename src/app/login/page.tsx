@@ -69,14 +69,14 @@ export default function LoginPage() {
           </InputField>
           <InputField label="Password" inputId="login-password">
             <Password
-              id="login-password"
+              inputId="login-password"
               name="password"
               autoComplete="off"
               feedback={false}
               toggleMask
             />
           </InputField>
-          <Button label="Login" type="submit" disabled={busy} />
+          <Button label="Login" type="submit" disabled={busy} id="login-submit" />
           {busy && <ProgressSpinner />}
         </form>
       </div>

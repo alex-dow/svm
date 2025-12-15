@@ -69,6 +69,7 @@ export default function AppAvatar({ username }: AppAvatarProps) {
         icon="pi pi-user"
         shape="circle"
         id="app-avatar"
+        data-username={username}
         onClick={(event) => menu.current!.toggle(event)}
         aria-controls="app-avatar-menu"
         aria-haspopup="true"
