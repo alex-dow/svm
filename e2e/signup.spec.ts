@@ -5,7 +5,7 @@ import { MailpitClient } from "mailpit-api";
 
 test.describe("Login Workflow", () => {
 
-console.log('SMTP PORT:', process.env.SMTP_API_PORT);
+console.log('env:', process.env);
 
   const mailpit: MailpitClient = new MailpitClient(
     `http://localhost:${process.env.SMTP_API_PORT}`,

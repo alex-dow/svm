@@ -1,15 +1,24 @@
 import { defineConfig, devices } from '@playwright/test';
 import dotenv from 'dotenv';
-/**
- * Read environment variables from file.
- * https://github.com/motdotla/dotenv
- */
-// import dotenv from 'dotenv';
-// import path from 'path';
-// dotenv.config({ path: path.resolve(__dirname, '.env') });
 dotenv.config({ path: '.env.test' });
 
+if (!process.env.SMTP_API_PORT) {
+  console.warn('[warn] SMTP_API_PORT set to 8025');
+  process.env.SMTP_API_PORT = '8025';
+}
+
+if (!process.env.SMTP_FROM) {
+  console.warn('[warn] SMTP_FROM set to test@svm.com');
+  process.env.SMTP_FROM = 'test@svm.com';
+}
+
+if (!process.env.SMTP_PORT) {
+  console.warn('[warn] SMTP_PORT set to 1025');
+  process.env.SMTP_PORT = '1025';
+}
+
 export default defineConfig({
+  
   testDir: './e2e',
   /* Run tests in files in parallel */
   fullyParallel: true,

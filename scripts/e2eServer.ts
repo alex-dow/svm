@@ -6,24 +6,16 @@ import { GenericContainer } from 'testcontainers';
 dotenv.config({ path: '.env.test' });
 
 async function startDevServer() {
-    const pgurl = process.env.DATABASE_URL as string;
-    const parsedUrl = new URL(pgurl);
-    const username = parsedUrl.username;
-    const password = parsedUrl.password;
-    const host = parsedUrl.hostname;
-    const port = parsedUrl.port;
-    const database = parsedUrl.pathname.substring(1);
     
     
     const pgContainer = await new PostgreSqlContainer("postgres:latest")
     .withDatabase("svm_test")
-    .withUsername(username)
-    .withPassword(password)
     .withStartupTimeout(10000)
     .start();
 
     const pguri = pgContainer.getConnectionUri();
-    process.env.DATABASE_URL = pguri;    
+    process.env.DATABASE_URL = pguri;
+    
     console.log('[e2eserver] PostgreSQL container started:', pguri);
 
     const mailpitContainer = await new GenericContainer("axllent/mailpit:latest")
@@ -41,8 +33,8 @@ async function startDevServer() {
 
     process.env.SMTP_HOST = 'localhost';
     process.env.SMTP_PORT = smtpPort.toString();
-    process.env.SMTP_FROM = 'test@test.com';
-    process.env.SMTP_API = 'http://localhost:' + mailpitHttpPort;
+    process.env.SMTP_FROM = 'test@svm.com';
+    process.env.SMTP_API_PORT = mailpitHttpPort.toString();
 
     console.log('[e2eserver] Mailpit container started: http://localhost:' + mailpitHttpPort);
 
