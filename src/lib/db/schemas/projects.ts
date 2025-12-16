@@ -6,6 +6,13 @@ export interface ProjectTable {
     owner_id: string;
 }
 
+export interface ProjectCounts {
+    trains: number;
+    train_stations: number;
+}
+
+export type ProjectWithCounts = Selectable<ProjectTable> & ProjectCounts;
+
 export type Project = Selectable<ProjectTable>;
 export type CreateProject = Insertable<ProjectTable>;
 export type UpdateProject = Updateable<ProjectTable>;

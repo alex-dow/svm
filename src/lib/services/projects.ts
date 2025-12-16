@@ -6,7 +6,8 @@
  */
 "use server";
 import { getDatabase } from "@/lib/db";
-import { cacheTag, updateTag } from "next/cache";
+import { cacheTag, revalidateTag, updateTag } from "next/cache";
+import { fn } from "kysely";
 
 export interface GetProjectsParams {
   ownerId: string;
@@ -17,11 +18,21 @@ export async function getProjects({ ownerId }: GetProjectsParams) {
   cacheTag("projects-" + ownerId);
   if (!ownerId) throw new Error("No owner id provided");
 
-  let query = getDatabase().selectFrom("project").selectAll();
-  if (ownerId) {
-    query = query.where("owner_id", "=", ownerId);
-  }
-  return query.execute();
+
+
+  const db = getDatabase();
+  const query =db.selectFrom('project')
+  .leftJoin('train_station', 'project.id', 'train_station.project_id')
+  .leftJoin('train', 'project.id', 'train.project_id')
+  .select('project.id as id')
+  .select('project.name as name')
+  .select('project.owner_id as owner_id')
+  .select(({fn}) => fn.count<number>('train_station.id').as('train_stations'))
+  .select(({fn}) => fn.count<number>('train.id').as('trains'))
+  .where('project.owner_id', '=', ownerId)
+  .groupBy('project.id');
+  
+  return await query.execute();
 }
 
 export interface GetProjectParams {
@@ -51,7 +62,7 @@ export async function renameProject({
   ownerId,
   name,
 }: RenameProjectParams) {
-  updateTag("projects-" + ownerId);
+  revalidateTag("projects-" + ownerId, 'max');
   if (!projectId || !ownerId || !name) {
     throw new Error("Project id, owner id and name are required");
   }
@@ -69,7 +80,7 @@ export interface CreateProjectParams {
 }
 
 export async function createProject({ name, ownerId }: CreateProjectParams) {
-  updateTag("projects-" + ownerId);
+  revalidateTag("projects-" + ownerId, 'max');
   if (!name || !ownerId) {
     throw new Error("Name and ownerId are required");
   }

@@ -16,6 +16,7 @@
     "export:save": "tsx scripts/exportSave.ts",
     "export:data": "tsx scripts/generateData.ts",
     "test": "vitest",
+    "test:coverage": "vitest --coverage",
     "e2e": "NODE_ENV=test tsx scripts/e2eWrapper.ts test",
     "e2e:install": "playwright install"
   },
@@ -60,6 +61,7 @@
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
     "@vitejs/plugin-react": "^5.1.2",
+    "@vitest/coverage-v8": "^4.0.15",
     "@vitest/ui": "^4.0.15",
     "dotenv": "^17.2.3",
     "env-cmd": "^11.0.0",
@@ -75,10 +77,5 @@
     "tsx": "^4.21.0",
     "typescript": "^5.9.3",
     "vitest": "^4.0.15"
-  },
-  "overrides": {
-    "kysely-codegen": {
-      "better-sqlite3": "^12.5.0"
-    }
   }
 }

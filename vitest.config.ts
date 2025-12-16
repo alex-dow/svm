@@ -9,6 +9,11 @@ export default defineConfig({
     setupFiles: ["./vitest.setup.ts"],
     globals: true,
     exclude: ["**/node_modules/**", "**/dist/**", "**/srcold/**", "**/e2e/**"],
+    coverage: {
+      include: ['src/**/*.{ts,tsx,js,jsx}'],
+      reporter: ['json', 'json-summary', 'html'],
+      reportsDirectory: 'coverage'
+    }
   },
   resolve: {
     alias: {
