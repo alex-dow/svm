@@ -60,7 +60,7 @@ export function getDatabase(dbUrl?: string): Kysely<SVMDatabase> {
 
             const kysely = new Kysely<SVMDatabase>({
                 dialect,
-                log: ['error']
+                log: ['error', 'query']
             });
             db = kysely;
         } else {

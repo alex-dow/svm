@@ -81,9 +81,5 @@ test.describe("Login Workflow", () => {
     
     const appAvatar = page.locator("#app-avatar");
     await expect(appAvatar).toHaveAttribute("data-username", "testuser");
-
-    
-
   });
-
 });

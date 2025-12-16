@@ -9,7 +9,7 @@ import { useForm, SubmitHandler, Controller } from "react-hook-form";
 import InputField from "@/components/form/InputField";
 import { ProgressSpinner } from "primereact/progressspinner";
 
-interface IFormInput {
+interface SignupFormFields {
   username: string;
   email: string;
   password: string;
@@ -52,7 +52,7 @@ const passwordValidation = {
 
 const confirmPasswordValidation = {
   required: "Confirm password is required",
-  validate: (value: string, formValues: IFormInput) => {
+  validate: (value: string, formValues: SignupFormFields) => {
     return value !== formValues.password ? "Passwords do not match" : undefined;
   },
 };
@@ -67,7 +67,7 @@ function SignupComplete() {
   );
 }
 
-function SignupErrorMessage({ error }: { error: any }) {
+function SignupErrorMessage({ error }: { error: { message: string } }) {
   return <Message severity="error" text={error.message} id="signup-error-message" />;
 }
 
@@ -87,7 +87,7 @@ function SignupForm({
     handleSubmit,
     control,
     formState: { errors, isValid },
-  } = useForm<IFormInput>({
+  } = useForm<SignupFormFields>({
     defaultValues: {
       username: "",
       email: "",
@@ -96,7 +96,7 @@ function SignupForm({
     },
     mode: "onBlur",
   });
-  const submitHandler: SubmitHandler<IFormInput> = async (e) => {
+  const submitHandler: SubmitHandler<SignupFormFields> = async (e) => {
     setBusy(true);
     setSignupError(null);
 
@@ -108,7 +108,7 @@ function SignupForm({
       return;
     }
     try {
-      const { data, error } = await authClient.signUp.email({
+      const { error } = await authClient.signUp.email({
         email,
         name: username,
         username: username,
@@ -134,7 +134,7 @@ function SignupForm({
       id="signup-form"
       className="flex flex-col gap-4 pb-4"
     >
-      {signupError && <SignupErrorMessage error={signupError} />}
+      {signupError && <SignupErrorMessage error={signupError as { message: string }} />}
       <InputField
         invalid={errors.username ? true : false}
         invalidMessage={errors.username?.message as string}

@@ -1,16 +1,24 @@
-import { getServerSession } from "@/lib/auth/server";
+
+import ItemsTabView from "@/components/projects/itemsTabs/ItemsTabView";
+
 
 export default async function ProjectLayout({
   children,
-  params
 }: {
   children: React.ReactNode;
-  params: Promise<{ projectId: string }>;
 }) {
-  const { projectId } = await params;
+  
 
-  return <div>
-    <p>Layout id: {projectId}</p>
-    {children}
-    </div>;
+  return (
+    <div className="flex flex-1">
+      <div className="w-4/12 border-r border-stone-800">
+        <ItemsTabView />
+      </div>
+      <div className="w-8/12">
+        {children}
+      </div>
+    </div>
+  )
+  
+  ;
 }

@@ -4,6 +4,14 @@ import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";
 import { useToastContext } from "../contexts/ToastContextProvider";
 
+interface NewProjectFormFields {
+  projectName: string;
+}
+
+const projectNameValidation = {
+  required: "Name is required",
+};
+
 export interface NewProjectModalProps {
   visible: boolean;
   setVisible: (visible: boolean) => void;
@@ -57,6 +65,7 @@ export default function NewProjectModal(props: NewProjectModalProps) {
             required
             id="new-project-name"
             name="project-name"
+            autoFocus
           />
           <Button label="Create" type="submit" id="new-project-submit" />
         </div>
