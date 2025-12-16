@@ -1,14 +1,16 @@
 
 import { TabView, TabPanel, TabPanelPassThroughOptions } from "primereact/tabview";
-import TrainsTab from "@/components/projects/itemsTabs/TrainsTab";
-import TrainStationsTab from "@/components/projects/itemsTabs/TrainStationsTab";
 import Image from "next/image";
+import ItemsTabPanel from "./ItemsTabPanel";
+import { createTrainAction, getTrainsAction, deleteTrainAction} from "@/actions/trains";
+import { Suspense } from "react";
+import { ProgressSpinner } from "primereact/progressspinner";
 
 
 function TabIcon({ icon, alt }: { icon: string, alt: string }) {
   return (
-    <div className="w-[32px] h-[32px] p-0.5 bg-amber-700 rounded-md flex items-center justify-center">
-      <Image src={icon} alt={alt} aria-hidden="true" width={32} height={32} />
+    <div className="w-[40px] h-[40px] p-1 bg-stone-800 rounded-md flex items-center justify-center">
+      <Image src={icon} alt={alt} aria-hidden="true" width={64} height={64} />
     </div>
   )
 }
@@ -19,19 +21,17 @@ const tabPanelPt: TabPanelPassThroughOptions = {
   }
 }
 
-export default function ItemsTabView() {
+export default async function ItemsTabView({ projectId }: { projectId: number }) {
   return (
     <TabView id="project-tabs">
       <TabPanel pt={tabPanelPt} header="Trains" leftIcon={
         <TabIcon icon="/data/items/desc-locomotive-c_64.png" alt="Trains"/>
       }>
-        <TrainsTab />
+        
+        <ItemsTabPanel newButtonLabel="New train" fetchAction={getTrainsAction} submitAction={createTrainAction} deleteAction={deleteTrainAction} projectId={projectId}/>
+        
       </TabPanel>
-      <TabPanel pt={tabPanelPt} header="Train stations" leftIcon={
-        <TabIcon icon="/data/items/desc-trainstation-c_64.png" alt="Train stations"/>
-      }>
-        <TrainStationsTab />
-      </TabPanel>
+
     </TabView>
   );
 }
