@@ -1,4 +1,4 @@
-import { getProjectAction } from "@/actions/projects";
+import { getProjectAction } from "@/lib/actions/projects";
 import { getServerSession } from "@/lib/auth/server";
 import { getProject } from "@/lib/services/projects";
 

@@ -1,6 +1,7 @@
 'use server';
-import { cacheTag, revalidateTag, updateTag } from "next/cache";
+import { cacheTag,  updateTag } from "next/cache";
 import { getDatabase } from "../db";
+import { UpdateTrain } from "../db/schemas/trains";
 
 export type GetTrainsParams ={
     projectId: number;
@@ -20,6 +21,23 @@ export async function getTrains({ projectId, ownerId }: GetTrainsParams) {
     
     
   return await query.execute();
+}
+
+export interface GetTrainParams {
+  id: number;
+  projectId: number;
+  ownerId: string;
+}
+
+export async function getTrain({ id, projectId, ownerId }: GetTrainParams) {
+  const train = await getDatabase()
+    .selectFrom("train")
+    .selectAll()
+    .where("id", "=", id)
+    .where("project_id", "=", projectId)
+    .where("owner_id", "=", ownerId)
+    .executeTakeFirstOrThrow();
+  return train;
 }
 
 export interface CreateTrainParams {
@@ -43,6 +61,7 @@ export async function createTrain({ name, ownerId, projectId }: CreateTrainParam
     .executeTakeFirstOrThrow();
 
   updateTag("trains-" + projectId + "-" + ownerId);
+  updateTag('projects-' + ownerId);
 
   return train;
 }
@@ -69,4 +88,26 @@ export async function deleteTrain({ id, projectId, ownerId }: DeleteTrainParams)
   }
 
   updateTag("trains-" + projectId + "-" + ownerId);
+}
+
+export interface UpdateTrainParams {
+  id: number;
+  projectId: number;
+  ownerId: string;
+  train: UpdateTrain;
+}
+
+export async function updateTrain({id, projectId, ownerId, train}: UpdateTrainParams) {
+  const result = await getDatabase()
+    .updateTable("train")
+    .set(train)
+    .where("id", "=", id)
+    .where("project_id", "=", projectId)
+    .where("owner_id", "=", ownerId)
+    .executeTakeFirstOrThrow()
+
+  
+    
+  updateTag("trains-" + projectId + "-" + ownerId);
+  return result;
 }

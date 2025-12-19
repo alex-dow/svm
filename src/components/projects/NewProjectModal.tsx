@@ -1,4 +1,4 @@
-import { createProjectAction } from "@/actions/projects";
+import { createProjectAction } from "@/lib/actions/projects";
 import { Button } from "primereact/button";
 import { Dialog } from "primereact/dialog";
 import { InputText } from "primereact/inputtext";

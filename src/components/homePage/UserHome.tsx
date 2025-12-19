@@ -2,7 +2,7 @@
 
 import { User } from "better-auth";
 import ProjectsList from "../projects/ProjectsList";
-import { getProjectsAction } from "@/actions/projects";
+import { getProjectsAction } from "@/lib/actions/projects";
 
 export default async function UserHome({ user }: { user: User }) {
   return (

@@ -1,12 +1,9 @@
-import { SessionContextProvider } from "@/components/contexts/SessionContextProvider";
 import SessionWrapper from "@/components/contexts/SessionWrapper";
 import { ToastContextProvider } from "@/components/contexts/ToastContextProvider";
-import AppAvatar from "@/components/header/AppAvatar";
 import AppHeader from "@/components/header/AppHeader";
 import "@/css/global.css";
-import { auth } from "@/lib/auth/server";
-import { headers } from "next/headers";
 import { PrimeReactProvider } from "primereact/api";
+import { ConfirmPopup } from "primereact/confirmpopup";
 import { ProgressSpinner } from "primereact/progressspinner";
 import { Suspense } from "react";
 
@@ -23,6 +20,7 @@ export default async function Layout({
       </head>
       <body className={`antialiased dark flex flex-col`}>
         <PrimeReactProvider>
+          <ConfirmPopup />
           <Suspense fallback={<ProgressSpinner />}>
             <SessionWrapper>
               <AppHeader />

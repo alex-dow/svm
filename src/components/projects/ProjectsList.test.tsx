@@ -1,13 +1,12 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
-import { render, screen, waitFor } from "@testing-library/react";
+import { render } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import NewProjectModal from "./NewProjectModal";
-import { createProjectAction, getProjectsAction } from "@/actions/projects";
+
 import { ProjectWithCounts } from "@/lib/db/schemas/projects";
 import ProjectsList from "./ProjectsList";
 
 // Mock the actions
-vi.mock("@/actions/projects", () => ({
+vi.mock("@/lib/actions/projects", () => ({
   getProjectsAction: vi.fn()
 }));
 

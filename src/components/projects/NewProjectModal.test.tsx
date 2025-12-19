@@ -1,22 +1,22 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import NewProjectModal from "./NewProjectModal";
-import { createProjectAction } from "@/actions/projects";
-import { useToastContext } from "../contexts/ToastContextProvider";
 
-// Mock the actions
-vi.mock("@/actions/projects", () => ({
+// Mock the actions BEFORE importing the component
+vi.mock("@/lib/actions/projects", () => ({
   createProjectAction: vi.fn(),
 }));
 
-// Mock the toast context
+// Mock the toast context BEFORE importing the component
 const mockShowToast = vi.fn();
 vi.mock("../contexts/ToastContextProvider", () => ({
   useToastContext: vi.fn(() => ({
     showToast: mockShowToast,
   })),
 }));
+
+import NewProjectModal from "./NewProjectModal";
+import { createProjectAction } from "@/lib/actions/projects";
 
 describe("NewProjectModal", () => {
   const mockSetVisible = vi.fn();

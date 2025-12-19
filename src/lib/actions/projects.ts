@@ -2,7 +2,6 @@
 
 import { getServerSession } from "@/lib/auth/server";
 import { createProject, getProject, getProjects } from "@/lib/services/projects";
-import { cacheTag } from "next/cache";
 
 export async function createProjectAction(name: string) {
   const session = await getServerSession();

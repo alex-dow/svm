@@ -1,6 +1,7 @@
 
-import ItemsTabView from "@/components/projects/itemsTabs/ItemsTabView";
+import ItemTabView from "@/components/itemTabs/ItemTabView";
 import { ConfirmDialog } from "primereact/confirmdialog";
+
 
 
 export default async function ProjectLayout({
@@ -15,10 +16,11 @@ export default async function ProjectLayout({
 
   return (
     <div className="flex flex-1">
+
       <ConfirmDialog />
       <div className="w-4/12 border-r border-stone-800">
         <p>Project ID: { projectId }</p>
-        <ItemsTabView projectId={parseInt(projectId)} />
+        <ItemTabView projectId={parseInt(projectId)} />
       </div>
       <div className="w-8/12">
         {children}
