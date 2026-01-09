@@ -7,6 +7,7 @@ import { NameModalProvider } from "./ItemNameModalProvider";
 import { createTrainStationAction, deleteTrainStationAction, getTrainStationsAction, renameTrainStationAction } from "@/lib/actions/trainStations";
 
 
+
 /**
  * Wrapper to <TabView>. This is the container for all tabs.
  */
@@ -14,7 +15,11 @@ export default async function ItemTabView({ projectId }: { projectId: number }) 
 
   return (
     <NameModalProvider projectId={projectId}>
-      <TabView id="item-tabs">
+      <TabView id="item-tabs" className="p-0 m-0 flex-1 flex flex-col" pt={{
+        panelContainer: {
+          className:'p-0 m-0 flex-1 flex flex-col'
+        }
+      }}>
       
         <ItemTabPanel 
           itemType="train" 
@@ -24,6 +29,7 @@ export default async function ItemTabView({ projectId }: { projectId: number }) 
           renameAction={renameTrainAction} 
           deleteAction={deleteTrainAction} 
           createAction={createTrainAction}
+          createModalTitle="Create new train"
         />
 
         <ItemTabPanel
@@ -34,6 +40,7 @@ export default async function ItemTabView({ projectId }: { projectId: number }) 
           renameAction={renameTrainStationAction}
           deleteAction={deleteTrainStationAction}
           createAction={createTrainStationAction}
+          createModalTitle="Create new train station"
         />
       </TabView>
     </NameModalProvider>

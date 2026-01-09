@@ -16,17 +16,19 @@ export default async function ItemList(props: ItemListProps) {
   const items = await fetchAction(projectId);
 
   return (
-    <ul>
-      {items.map((item) => (
-        <ItemListItem 
-          key={item.id} 
-          item={item} 
-          projectId={projectId} 
-          deleteAction={deleteAction} 
-          renameAction={renameAction} 
-        />
+    <>
+      <ul className="list-none p-0 m-0 flex flex-col">
+        {items.map((item) => (
+          <ItemListItem 
+            key={item.id} 
+            item={item} 
+            projectId={projectId} 
+            deleteAction={deleteAction} 
+            renameAction={renameAction} 
+          />
         
-      ))}
-    </ul>
+        ))}
+      </ul>
+    </>
   )
 }

@@ -12,7 +12,7 @@ export default function AppHeader() {
         <Link href="/projects">Satisfactory Vehicle Manager</Link>
       </div>
       <div>
-        <AppAvatar username={session?.user.username ?? undefined} />
+        <AppAvatar username={session?.user.displayUsername ?? undefined} />
       </div>
     </header>
   );

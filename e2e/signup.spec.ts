@@ -6,6 +6,8 @@ import { getDatabase } from "@/lib/db";
 import { sql } from "kysely";
 import jsdom from 'jsdom';
 
+import { faker } from "@faker-js/faker";
+
 test.describe("Login Workflow", () => {
 
 
@@ -28,6 +30,10 @@ test.describe("Login Workflow", () => {
 
   test("Successful signup", async ({ page }) => {
 
+    const username = faker.internet.displayName();
+    const email = faker.internet.email();
+    const password = faker.internet.password({length: 12})
+
     const usernameInput = page.locator("#signup-username");
     const emailInput = page.locator("#signup-email");
     const passwordInput = page.locator("#signup-password");
@@ -35,21 +41,20 @@ test.describe("Login Workflow", () => {
     const submitButton = page.locator("#signup-submit");
 
     await usernameInput.focus();
-    await usernameInput.fill("testuser");
+    await usernameInput.fill(username);
     await page.keyboard.press('Tab');
     
     await expect(emailInput).toBeFocused();
-    await emailInput.fill("test@example.com");
+    await emailInput.fill(email);
     await page.keyboard.press('Tab');
     
     await expect(passwordInput).toBeFocused();
-    await passwordInput.fill("password123");
+    await passwordInput.fill(password);
     await page.keyboard.press('Tab');
     await page.keyboard.press('Tab'); // Second tab is to skip the password visibility toggle
 
     await expect(confirmPasswordInput).toBeFocused();
-    await confirmPasswordInput.fill("password123");
-    
+    await confirmPasswordInput.fill(password);
     
     await expect(submitButton).toBeEnabled();
     await page.keyboard.press('Enter');
@@ -72,14 +77,14 @@ test.describe("Login Workflow", () => {
     await expect(page.url()).toContain("/login?verified=true");
 
     const loginUsernameInput = page.locator("#login-username");
-    await loginUsernameInput.fill("testuser");
+    await loginUsernameInput.fill(username);
     const loginPasswordInput = page.locator("#login-password");
-    await loginPasswordInput.fill("password123");
+    await loginPasswordInput.fill(password);
     const loginButton = page.locator("#login-submit");
     await loginButton.click();
     await expect(page.url()).toContain("/");
     
     const appAvatar = page.locator("#app-avatar");
-    await expect(appAvatar).toHaveAttribute("data-username", "testuser");
+    await expect(appAvatar).toHaveAttribute("data-username", username);
   });
 });

@@ -15,7 +15,7 @@ export default function ProjectsListHeader() {
           onClick={() => setVisible(true)}
           icon="pi pi-plus"
         />
-      </div>    
+      </div>   
       <NewProjectModal visible={visible} setVisible={setVisible} />
     </>
   );

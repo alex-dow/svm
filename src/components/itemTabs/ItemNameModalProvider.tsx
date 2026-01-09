@@ -10,8 +10,11 @@ const NameModalContext = createContext<{
     hide: () => void;
     setItemId: (itemId: number | null) => void;
     setItemName: (itemName: string) => void;
-    setCreateAction: Dispatch<SetStateAction<CreateAction | null>>
-    setRenameAction: Dispatch<SetStateAction<RenameAction | null>>
+    setCreateAction: Dispatch<SetStateAction<CreateAction | null>>;
+    setRenameAction: Dispatch<SetStateAction<RenameAction | null>>;
+    setTitle: Dispatch<SetStateAction<React.ReactNode | null>>;
+    setPlaceholder: Dispatch<SetStateAction<string>>;
+    
       } | null>(null);
 
 
@@ -27,13 +30,19 @@ export function NameModalProvider({ projectId, children }: NameModalProviderProp
 
   const [ itemId, setItemId ] = useState<number | null>(null);
   const [ itemName, setItemName ] = useState<string>('');
+  const [ placeholder, setPlaceholder ] = useState<string>('');
   const [ createAction, setCreateAction ] = useState<CreateAction | null>(null);
   const [ renameAction, setRenameAction ] = useState<RenameAction | null>(null);
+  const [ title, setTitle] = useState<React.ReactNode | string>('');
 
   const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     const formData = new FormData(e.target as HTMLFormElement);
     const itemName = formData.get("item-name") as string;
+
+    if (!itemName || itemName.trim() === '') {
+      return;
+    }
 
     if (itemId) {
       if (!renameAction) {
@@ -54,14 +63,15 @@ export function NameModalProvider({ projectId, children }: NameModalProviderProp
 
 
   return (
-    <NameModalContext.Provider value={{ show, hide, setItemId, setItemName, setCreateAction, setRenameAction }}>
-      <Dialog visible={visible} onHide={hide}>
-        <div>Creating a thing for project #{projectId}</div>
-        <form onSubmit={onSubmit}>
-          <InputText name="item-name" id={projectId + '-item-name-input'} defaultValue={itemName}/>
-          <Button label="Save" type="submit" />
+    <NameModalContext.Provider value={{ show, hide, setItemId, setItemName, setCreateAction, setRenameAction, setTitle, setPlaceholder }}>
+      <Dialog visible={visible} onHide={hide} header={title}>
+        
+        <form onSubmit={onSubmit} className="flex" id={projectId + '-item-name-form'}>
+          <div className="p-inputgroup flex-1">
+            <InputText name="item-name" id={projectId + '-item-name-input'} defaultValue={itemName} placeholder={placeholder}/>
+            <Button label="Save" type="submit" size="small" id={projectId + '-item-name-submit'} />
+          </div>
         </form>
-        { itemId && itemName && <div>Item ID: {itemId}, Item Name: {itemName}</div>}
       </Dialog>   
       {children}
     </NameModalContext.Provider>

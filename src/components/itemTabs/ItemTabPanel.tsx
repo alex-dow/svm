@@ -16,21 +16,28 @@ export type ItemTabPanelProps = {
     confirmDeleteMessage?: string,
     newButtonLabel?: string,
     projectId: number,
+    createModalTitle?: string,
+    placeholder?: string
 
 }
 
 
 export default async function ItemTabPanel(props: ItemTabPanelProps) {
 
-  const { fetchAction, tabHeader, projectId, deleteAction, createAction, renameAction } = props;
+  const { fetchAction, tabHeader, projectId, deleteAction, createAction, renameAction, createModalTitle, placeholder } = props;
   
     
   return (
-    <TabPanel header={tabHeader}>
-      <AddItemButton createAction={createAction} />
-      <Suspense fallback={<ProgressSpinner />}>
-        <ItemList fetchAction={fetchAction} projectId={projectId} deleteAction={deleteAction} renameAction={renameAction} />
-      </Suspense>
+    <TabPanel header={tabHeader} className="p-0 pt-2 m-0 flex flex-col flex-1">
+      <div className="p-1 flex">
+        <AddItemButton createAction={createAction} createModalTitle={createModalTitle} placeholder={placeholder} />
+      </div>      
+      <div className="flex-1">
+        <Suspense fallback={<ProgressSpinner />}>
+          <ItemList fetchAction={fetchAction} projectId={projectId} deleteAction={deleteAction} renameAction={renameAction} />
+        </Suspense>
+      </div>
+      
     </TabPanel>
   )
 }

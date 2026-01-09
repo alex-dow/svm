@@ -94,7 +94,7 @@ function SignupForm({
       password: "",
       confirmPassword: "",
     },
-    mode: "onBlur",
+    mode: "onChange",
   });
   const submitHandler: SubmitHandler<SignupFormFields> = async (e) => {
     setBusy(true);
